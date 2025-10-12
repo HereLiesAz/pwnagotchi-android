@@ -9,6 +9,7 @@ import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,6 +81,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     var showSettings by remember { mutableStateOf(false) }
                     var showPlugins by remember { mutableStateOf(false) }
+                    var showOpwngrid by remember { mutableStateOf(false) }
                     when {
                         showSettings -> {
                             SettingsScreen(
@@ -98,6 +101,15 @@ class MainActivity : ComponentActivity() {
                                         pwnagotchiService?.togglePlugin(pluginName, enabled)
                                     },
                                     onBack = { showPlugins = false }
+                                )
+                            }
+                        }
+                        showOpwngrid -> {
+                            val uiState by viewModel.uiState.collectAsState()
+                            if (uiState is PwnagotchiUiState.Connected) {
+                                OpwngridScreen(
+                                    leaderboard = (uiState as PwnagotchiUiState.Connected).leaderboard,
+                                    onBack = { showOpwngrid = false }
                                 )
                             }
                         }
@@ -123,7 +135,11 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 onSettings = { showSettings = true },
-                                onPlugins = { showPlugins = true }
+                                onPlugins = { showPlugins = true },
+                                onOpwngrid = {
+                                    viewModel.fetchLeaderboard()
+                                    showOpwngrid = true
+                                }
                             )
                         }
                     }
@@ -157,6 +173,7 @@ fun PwnagotchiScreen(
     onRequestRoot: () -> Unit,
     onSettings: () -> Unit,
     onPlugins: () -> Unit,
+    onOpwngrid: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -196,6 +213,9 @@ fun PwnagotchiScreen(
             Button(onClick = onPlugins) {
                 Text(stringResource(id = R.string.plugins))
             }
+            Button(onClick = onOpwngrid) {
+                Text("oPwngrid")
+            }
             Spacer(modifier = Modifier.height(16.dp))
             RootControls(rootStatus = rootStatus, onRequestRoot = onRequestRoot)
             Spacer(modifier = Modifier.height(16.dp))
@@ -222,7 +242,17 @@ fun ConnectionStatus(uiState: PwnagotchiUiState) {
                     Text(text = uiState.message, style = MaterialTheme.typography.bodyMedium)
                 }
                 is PwnagotchiUiState.Connected -> {
-                    Text(text = uiState.face, style = MaterialTheme.typography.displayLarge)
+                    val faceDrawable = when (uiState.face) {
+                        "(·•᷄_•᷅ ·)" -> R.drawable.face_sad
+                        "(^‿^)" -> R.drawable.face_happy
+                        "(¬‿¬)" -> R.drawable.face_bored
+                        else -> R.drawable.face_happy // Default face
+                    }
+                    Image(
+                        painter = painterResource(id = faceDrawable),
+                        contentDescription = "Pwnagotchi Face",
+                        modifier = Modifier.size(100.dp)
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = stringResource(id = R.string.connected), style = MaterialTheme.typography.titleMedium)
                     Text(text = uiState.data, style = MaterialTheme.typography.bodyMedium)
@@ -321,14 +351,15 @@ fun PwnagotchiScreenPreview() {
                     Handshake("AP1", "STA1", "file1.pcap"),
                     Handshake("AP2", "STA2", "file2.pcap")
                 ),
-                face = "(^-^)"
+                face = "(^‿^)"
             ),
             rootStatus = "Root status: Unknown",
             onConnect = {},
             onDisconnect = {},
             onRequestRoot = {},
             onSettings = {},
-            onPlugins = {}
+            onPlugins = {},
+            onOpwngrid = {}
         )
     }
 }

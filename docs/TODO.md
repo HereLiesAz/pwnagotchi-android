@@ -8,12 +8,12 @@ All current tasks are complete.
 
 ### Pwnagotchi Character Engine
 - [ ] Research different Pwnagotchi forks to understand character engine variations.
-- [ ] Implement a more advanced character engine in the Android app, potentially using images or animations.
+- [x] Implement a more advanced character engine in the Android app, potentially using images or animations.
 - [ ] Allow users to customize the character's appearance.
 
 ### Pwnserver/oPwngrid Integration
-- [ ] Implement a client for the oPwngrid API.
-- [ ] Display oPwngrid data in the Android app (e.g., leaderboards, statistics).
+- [x] Implement a client for the oPwngrid API.
+- [x] Display oPwngrid data in the Android app (e.g., leaderboards, statistics).
 - [ ] Allow users to submit data to oPwngrid from the app.
 
 ### Automatic Remote Instance Setup
