@@ -10,7 +10,7 @@ echo "Installing Python dependencies..."
 # It's recommended to use a virtual environment
 # python3 -m venv venv
 # source venv/bin/activate
-pip install -r requirements.txt
+pip install websockets
 
 # --- Android Dependencies (Manual Steps) ---
 echo "--------------------------------------------------"
