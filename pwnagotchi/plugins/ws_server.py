@@ -50,7 +50,14 @@ class WSServer(plugins.Plugin):
         # This method is called when the UI is updated.
         # We can send the UI data to the clients.
         if self.loop and self.server:
-            asyncio.run_coroutine_threadsafe(self._broadcast(json.dumps(ui.get_data())), self.loop)
+            data = {'type': 'ui_update', 'data': ui._state._state}
+            asyncio.run_coroutine_threadsafe(self._broadcast(json.dumps(data, default=lambda o: '<not serializable>')), self.loop)
+
+    def on_handshake(self, agent, filename, ap, sta):
+        # This method is called when a new handshake is captured.
+        if self.loop and self.server:
+            data = {'type': 'handshake', 'data': {'ap': ap, 'sta': sta, 'filename': filename}}
+            asyncio.run_coroutine_threadsafe(self._broadcast(json.dumps(data, default=lambda o: '<not serializable>')), self.loop)
 
     async def _broadcast(self, message):
         # Send a message to all connected clients.

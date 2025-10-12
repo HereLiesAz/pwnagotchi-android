@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
@@ -65,27 +69,39 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val uiState by viewModel.uiState.collectAsState()
-                    var rootStatus by remember { mutableStateOf("Root status: Unknown") }
-                    PwnagotchiScreen(
-                        uiState = uiState,
-                        rootStatus = rootStatus,
-                        onConnect = { ipAddress ->
-                            pwnagotchiService?.connect(URI("ws://$ipAddress:8765"))
-                        },
-                        onDisconnect = {
-                            pwnagotchiService?.disconnect()
-                        },
-                        onRequestRoot = {
-                            Shell.getShell { shell ->
-                                rootStatus = if (shell.isRoot) {
-                                    "Root status: Granted"
-                                } else {
-                                    "Root status: Denied"
+                    var showSettings by remember { mutableStateOf(false) }
+                    if (showSettings) {
+                        SettingsScreen(
+                            onSave = { ipAddress ->
+                                pwnagotchiService?.connect(URI("ws://$ipAddress:8765"))
+                                showSettings = false
+                            },
+                            onBack = { showSettings = false }
+                        )
+                    } else {
+                        val uiState by viewModel.uiState.collectAsState()
+                        var rootStatus by remember { mutableStateOf("Root status: Unknown") }
+                        PwnagotchiScreen(
+                            uiState = uiState,
+                            rootStatus = rootStatus,
+                            onConnect = { ipAddress ->
+                                pwnagotchiService?.connect(URI("ws://$ipAddress:8765"))
+                            },
+                            onDisconnect = {
+                                pwnagotchiService?.disconnect()
+                            },
+                            onRequestRoot = {
+                                Shell.getShell { shell ->
+                                    rootStatus = if (shell.isRoot) {
+                                        "Root status: Granted"
+                                    } else {
+                                        "Root status: Denied"
+                                    }
                                 }
-                            }
-                        }
-                    )
+                            },
+                            onSettings = { showSettings = true }
+                        )
+                    }
                 }
             }
         }
@@ -114,9 +130,16 @@ fun PwnagotchiScreen(
     onConnect: (String) -> Unit,
     onDisconnect: () -> Unit,
     onRequestRoot: () -> Unit,
+    onSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var ipAddress by remember { mutableStateOf("192.168.1.100") }
+    val context = LocalContext.current
+    val sharedPreferences = remember {
+        context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+    }
+    var ipAddress by remember {
+        mutableStateOf(sharedPreferences.getString("ip_address", "192.168.1.100") ?: "192.168.1.100")
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -129,7 +152,15 @@ fun PwnagotchiScreen(
                 CircularProgressIndicator()
                 Text(text = uiState.message)
             }
-            is PwnagotchiUiState.Connected -> Text(text = uiState.data)
+            is PwnagotchiUiState.Connected -> {
+                Text(text = uiState.data)
+                Spacer(modifier = Modifier.height(16.dp))
+                LazyColumn {
+                    items(uiState.handshakes) { handshake ->
+                        HandshakeItem(handshake = handshake)
+                    }
+                }
+            }
             is PwnagotchiUiState.Disconnected -> Text(text = uiState.reason)
             is PwnagotchiUiState.Error -> Text(text = uiState.message)
         }
@@ -151,10 +182,30 @@ fun PwnagotchiScreen(
         Button(onClick = onDisconnect) {
             Text("Disconnect")
         }
+        Button(onClick = onSettings) {
+            Text("Settings")
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = rootStatus)
         Button(onClick = onRequestRoot) {
             Text("Request Root")
+        }
+    }
+}
+
+@Composable
+fun HandshakeItem(handshake: Handshake) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(text = "AP: ${handshake.ap}")
+            Text(text = "STA: ${handshake.sta}")
+            Text(text = "File: ${handshake.filename}")
         }
     }
 }
@@ -164,11 +215,18 @@ fun PwnagotchiScreen(
 fun PwnagotchiScreenPreview() {
     PwnagotchiAndroidTheme {
         PwnagotchiScreen(
-            uiState = PwnagotchiUiState.Connected("Preview"),
+            uiState = PwnagotchiUiState.Connected(
+                "Preview",
+                listOf(
+                    Handshake("AP1", "STA1", "file1.pcap"),
+                    Handshake("AP2", "STA2", "file2.pcap")
+                )
+            ),
             rootStatus = "Root status: Unknown",
             onConnect = {},
             onDisconnect = {},
-            onRequestRoot = {}
+            onRequestRoot = {},
+            onSettings = {}
         )
     }
 }

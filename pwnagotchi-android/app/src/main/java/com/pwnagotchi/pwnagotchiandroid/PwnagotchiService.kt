@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
+import org.json.JSONObject
 import java.net.URI
 
 class PwnagotchiService : Service() {
@@ -30,6 +32,7 @@ class PwnagotchiService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
     private var reconnectionJob: Job? = null
     private var currentUri: URI? = null
+    private val handshakes = mutableListOf<Handshake>()
 
     inner class LocalBinder : Binder() {
         fun getService(): PwnagotchiService = this@PwnagotchiService
@@ -42,6 +45,11 @@ class PwnagotchiService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notification = createNotification("Pwnagotchi service is running")
         startForeground(1, notification)
+        val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+        val ipAddress = sharedPreferences.getString("ip_address", null)
+        if (ipAddress != null) {
+            connect(URI("ws://$ipAddress:8765"))
+        }
         return START_STICKY
     }
 
@@ -54,12 +62,29 @@ class PwnagotchiService : Service() {
         try {
             webSocketClient = object : WebSocketClient(uri) {
                 override fun onOpen(handshakedata: ServerHandshake?) {
-                    _uiState.value = PwnagotchiUiState.Connected("Connected")
+                    _uiState.value = PwnagotchiUiState.Connected("Connected", handshakes)
                     updateNotification("Connected to Pwnagotchi")
                 }
 
                 override fun onMessage(message: String?) {
-                    _uiState.value = PwnagotchiUiState.Connected(message ?: "")
+                    val json = JSONObject(message)
+                    when (json.getString("type")) {
+                        "ui_update" -> {
+                            val data = json.getJSONObject("data").toString()
+                            _uiState.value = PwnagotchiUiState.Connected(data, handshakes)
+                        }
+                        "handshake" -> {
+                            val data = json.getJSONObject("data")
+                            val handshake = Handshake(
+                                ap = data.getJSONObject("ap").getString("hostname"),
+                                sta = data.getJSONObject("sta").getString("mac"),
+                                filename = data.getString("filename")
+                            )
+                            handshakes.add(handshake)
+                            _uiState.value = PwnagotchiUiState.Connected("New handshake captured!", handshakes)
+                            updateNotification("New handshake captured!")
+                        }
+                    }
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
