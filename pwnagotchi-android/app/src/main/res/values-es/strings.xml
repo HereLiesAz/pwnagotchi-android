@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Pwnagotchi Android</string>
+    <string name="pwnagotchi_ip">IP de Pwnagotchi</string>
+    <string name="connect">Conectar</string>
+    <string name="disconnect">Desconectar</string>
+    <string name="settings">Ajustes</string>
+    <string name="plugins">Plugins</string>
+    <string name="request_root">Solicitar Root</string>
+    <string name="root_status_unknown">Estado de Root: Desconocido</string>
+    <string name="root_status_granted">Estado de Root: Concedido</string>
+    <string name="root_status_denied">Estado de Root: Denegado</string>
+    <string name="connected">Conectado</string>
+    <string name="disconnected">Desconectado</string>
+    <string name="error">Error</string>
+    <string name="save">Guardar</string>
+    <string name="back">Atrás</string>
+    <string name="theme">Tema</string>
+    <string name="system">Sistema</string>
+    <string name="light">Claro</string>
+    <string name="dark">Oscuro</string>
+    <string name="ap">PA</string>
+    <string name="sta">STA</string>
+    <string name="file">Archivo</string>
+</resources>
