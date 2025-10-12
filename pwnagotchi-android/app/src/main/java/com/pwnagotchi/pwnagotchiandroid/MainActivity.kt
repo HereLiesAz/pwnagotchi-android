@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
@@ -102,7 +103,7 @@ class MainActivity : ComponentActivity() {
                         }
                         else -> {
                             val uiState by viewModel.uiState.collectAsState()
-                            var rootStatus by remember { mutableStateOf("Root status: Unknown") }
+                            var rootStatus by remember { mutableStateOf(getString(R.string.root_status_unknown)) }
                             PwnagotchiScreen(
                                 uiState = uiState,
                                 rootStatus = rootStatus,
@@ -115,9 +116,9 @@ class MainActivity : ComponentActivity() {
                                 onRequestRoot = {
                                     Shell.getShell { shell ->
                                         rootStatus = if (shell.isRoot) {
-                                            "Root status: Granted"
+                                            getString(R.string.root_status_granted)
                                         } else {
-                                            "Root status: Denied"
+                                            getString(R.string.root_status_denied)
                                         }
                                     }
                                 },
@@ -168,10 +169,10 @@ fun PwnagotchiScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Pwnagotchi") },
+                title = { Text(stringResource(id = R.string.app_name)) },
                 actions = {
                     IconButton(onClick = onSettings) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                        Icon(Icons.Filled.Settings, contentDescription = stringResource(id = R.string.settings))
                     }
                 }
             )
@@ -193,7 +194,7 @@ fun PwnagotchiScreen(
                 onDisconnect = onDisconnect
             )
             Button(onClick = onPlugins) {
-                Text("Plugins")
+                Text(stringResource(id = R.string.plugins))
             }
             Spacer(modifier = Modifier.height(16.dp))
             RootControls(rootStatus = rootStatus, onRequestRoot = onRequestRoot)
@@ -221,15 +222,15 @@ fun ConnectionStatus(uiState: PwnagotchiUiState) {
                     Text(text = uiState.message, style = MaterialTheme.typography.bodyMedium)
                 }
                 is PwnagotchiUiState.Connected -> {
-                    Text(text = "Connected", style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(id = R.string.connected), style = MaterialTheme.typography.titleMedium)
                     Text(text = uiState.data, style = MaterialTheme.typography.bodyMedium)
                 }
                 is PwnagotchiUiState.Disconnected -> {
-                    Text(text = "Disconnected", style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(id = R.string.disconnected), style = MaterialTheme.typography.titleMedium)
                     Text(text = uiState.reason, style = MaterialTheme.typography.bodyMedium)
                 }
                 is PwnagotchiUiState.Error -> {
-                    Text(text = "Error", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error)
+                    Text(text = stringResource(id = R.string.error), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.error)
                     Text(text = uiState.message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
                 }
             }
@@ -253,14 +254,14 @@ fun ConnectionControls(
         OutlinedTextField(
             value = ipAddress,
             onValueChange = onIpAddressChange,
-            label = { Text("Pwnagotchi IP") },
+            label = { Text(stringResource(id = R.string.pwnagotchi_ip)) },
             modifier = Modifier.weight(1f)
         )
         Button(onClick = onConnect) {
-            Text("Connect")
+            Text(stringResource(id = R.string.connect))
         }
         Button(onClick = onDisconnect) {
-            Text("Disconnect")
+            Text(stringResource(id = R.string.disconnect))
         }
     }
 }
@@ -274,7 +275,7 @@ fun RootControls(rootStatus: String, onRequestRoot: () -> Unit) {
     ) {
         Text(text = rootStatus, modifier = Modifier.weight(1f))
         Button(onClick = onRequestRoot) {
-            Text("Request Root")
+            Text(stringResource(id = R.string.request_root))
         }
     }
 }
@@ -300,9 +301,9 @@ fun HandshakeItem(handshake: Handshake) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(text = "AP: ${handshake.ap}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "STA: ${handshake.sta}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "File: ${handshake.filename}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "${stringResource(id = R.string.ap)}: ${handshake.ap}", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "${stringResource(id = R.string.sta)}: ${handshake.sta}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "${stringResource(id = R.string.file)}: ${handshake.filename}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }

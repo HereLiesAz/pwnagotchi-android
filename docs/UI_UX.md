@@ -11,10 +11,18 @@ This document outlines the UI/UX design principles and guidelines for the Pwnago
 
 ## Colors
 
-*   **Primary Color:** #6200EE
-*   **Secondary Color:** #03DAC5
+The application uses the Material Design color system. The primary and secondary colors are defined in the `Theme.kt` file.
 
 ## Typography
 
-*   **Font Family:** Roboto
-*   **Font Size:** 16sp
+The application uses the Material Design type system. The default font is Roboto.
+
+## Themes
+
+The application supports the following themes:
+
+*   **System:** Follows the system theme (light or dark).
+*   **Light:** A light theme.
+*   **Dark:** A dark theme.
+
+The theme can be changed in the settings screen.

@@ -15,5 +15,5 @@ This file outlines the pending tasks and future enhancements for the Pwnagotchi 
 - [x] Create a persistent notification that displays all the things you would see on the original pi zero with that tiny little eink screen.
 
 ## Low Priority
-- [ ] Add support for themes.
-- [ ] Add support for multiple languages.
+- [x] Add support for themes.
+- [x] Add support for multiple languages.

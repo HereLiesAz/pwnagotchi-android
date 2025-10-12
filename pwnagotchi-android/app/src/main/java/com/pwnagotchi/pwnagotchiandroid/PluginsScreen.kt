@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -28,7 +29,7 @@ fun PluginsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("Plugins", style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
+        Text(stringResource(id = R.string.plugins), style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
         LazyColumn(
             modifier = Modifier.weight(1f)
         ) {
@@ -37,7 +38,7 @@ fun PluginsScreen(
             }
         }
         Button(onClick = onBack) {
-            Text("Back")
+            Text(stringResource(id = R.string.back))
         }
     }
 }
