@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class PwnagotchiViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow<PwnagotchiUiState>(PwnagotchiUiState.Loading)
+    private val _uiState = MutableStateFlow<PwnagotchiUiState>(PwnagotchiUiState.Disconnected("Not connected"))
     val uiState: StateFlow<PwnagotchiUiState> = _uiState
 
     fun setService(service: PwnagotchiService?) {
@@ -21,7 +21,8 @@ class PwnagotchiViewModel : ViewModel() {
 }
 
 sealed class PwnagotchiUiState {
-    object Loading : PwnagotchiUiState()
-    data class Success(val data: String) : PwnagotchiUiState()
+    data class Connecting(val message: String) : PwnagotchiUiState()
+    data class Connected(val data: String) : PwnagotchiUiState()
+    data class Disconnected(val reason: String) : PwnagotchiUiState()
     data class Error(val message: String) : PwnagotchiUiState()
 }

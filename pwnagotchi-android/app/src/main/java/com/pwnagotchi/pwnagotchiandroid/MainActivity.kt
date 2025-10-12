@@ -12,8 +12,10 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -71,6 +73,9 @@ class MainActivity : ComponentActivity() {
                         onConnect = { ipAddress ->
                             pwnagotchiService?.connect(URI("ws://$ipAddress:8765"))
                         },
+                        onDisconnect = {
+                            pwnagotchiService?.disconnect()
+                        },
                         onRequestRoot = {
                             Shell.getShell { shell ->
                                 rootStatus = if (shell.isRoot) {
@@ -107,6 +112,7 @@ fun PwnagotchiScreen(
     uiState: PwnagotchiUiState,
     rootStatus: String,
     onConnect: (String) -> Unit,
+    onDisconnect: () -> Unit,
     onRequestRoot: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -119,10 +125,15 @@ fun PwnagotchiScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (uiState) {
-            is PwnagotchiUiState.Loading -> CircularProgressIndicator()
-            is PwnagotchiUiState.Success -> Text(text = uiState.data)
+            is PwnagotchiUiState.Connecting -> {
+                CircularProgressIndicator()
+                Text(text = uiState.message)
+            }
+            is PwnagotchiUiState.Connected -> Text(text = uiState.data)
+            is PwnagotchiUiState.Disconnected -> Text(text = uiState.reason)
             is PwnagotchiUiState.Error -> Text(text = uiState.message)
         }
+        Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -137,6 +148,10 @@ fun PwnagotchiScreen(
                 Text("Connect")
             }
         }
+        Button(onClick = onDisconnect) {
+            Text("Disconnect")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         Text(text = rootStatus)
         Button(onClick = onRequestRoot) {
             Text("Request Root")
@@ -149,9 +164,10 @@ fun PwnagotchiScreen(
 fun PwnagotchiScreenPreview() {
     PwnagotchiAndroidTheme {
         PwnagotchiScreen(
-            uiState = PwnagotchiUiState.Success("Preview"),
+            uiState = PwnagotchiUiState.Connected("Preview"),
             rootStatus = "Root status: Unknown",
             onConnect = {},
+            onDisconnect = {},
             onRequestRoot = {}
         )
     }
