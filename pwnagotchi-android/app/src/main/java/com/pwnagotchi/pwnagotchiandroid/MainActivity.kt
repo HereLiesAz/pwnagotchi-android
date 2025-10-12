@@ -77,37 +77,54 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     var showSettings by remember { mutableStateOf(false) }
-                    if (showSettings) {
-                        SettingsScreen(
-                            onSave = { ipAddress ->
-                                pwnagotchiService?.connect(URI("ws://$ipAddress:8765"))
-                                showSettings = false
-                            },
-                            onBack = { showSettings = false }
-                        )
-                    } else {
-                        val uiState by viewModel.uiState.collectAsState()
-                        var rootStatus by remember { mutableStateOf("Root status: Unknown") }
-                        PwnagotchiScreen(
-                            uiState = uiState,
-                            rootStatus = rootStatus,
-                            onConnect = { ipAddress ->
-                                pwnagotchiService?.connect(URI("ws://$ipAddress:8765"))
-                            },
-                            onDisconnect = {
-                                pwnagotchiService?.disconnect()
-                            },
-                            onRequestRoot = {
-                                Shell.getShell { shell ->
-                                    rootStatus = if (shell.isRoot) {
-                                        "Root status: Granted"
-                                    } else {
-                                        "Root status: Denied"
+                    var showPlugins by remember { mutableStateOf(false) }
+                    when {
+                        showSettings -> {
+                            SettingsScreen(
+                                onSave = { ipAddress ->
+                                    pwnagotchiService?.connect(URI("ws://$ipAddress:8765"))
+                                    showSettings = false
+                                },
+                                onBack = { showSettings = false }
+                            )
+                        }
+                        showPlugins -> {
+                            val uiState by viewModel.uiState.collectAsState()
+                            if (uiState is PwnagotchiUiState.Connected) {
+                                PluginsScreen(
+                                    plugins = (uiState as PwnagotchiUiState.Connected).plugins,
+                                    onTogglePlugin = { pluginName, enabled ->
+                                        pwnagotchiService?.togglePlugin(pluginName, enabled)
+                                    },
+                                    onBack = { showPlugins = false }
+                                )
+                            }
+                        }
+                        else -> {
+                            val uiState by viewModel.uiState.collectAsState()
+                            var rootStatus by remember { mutableStateOf("Root status: Unknown") }
+                            PwnagotchiScreen(
+                                uiState = uiState,
+                                rootStatus = rootStatus,
+                                onConnect = { ipAddress ->
+                                    pwnagotchiService?.connect(URI("ws://$ipAddress:8765"))
+                                },
+                                onDisconnect = {
+                                    pwnagotchiService?.disconnect()
+                                },
+                                onRequestRoot = {
+                                    Shell.getShell { shell ->
+                                        rootStatus = if (shell.isRoot) {
+                                            "Root status: Granted"
+                                        } else {
+                                            "Root status: Denied"
+                                        }
                                     }
-                                }
-                            },
-                            onSettings = { showSettings = true }
-                        )
+                                },
+                                onSettings = { showSettings = true },
+                                onPlugins = { showPlugins = true }
+                            )
+                        }
                     }
                 }
             }
@@ -138,6 +155,7 @@ fun PwnagotchiScreen(
     onDisconnect: () -> Unit,
     onRequestRoot: () -> Unit,
     onSettings: () -> Unit,
+    onPlugins: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -174,6 +192,9 @@ fun PwnagotchiScreen(
                 onConnect = { onConnect(ipAddress) },
                 onDisconnect = onDisconnect
             )
+            Button(onClick = onPlugins) {
+                Text("Plugins")
+            }
             Spacer(modifier = Modifier.height(16.dp))
             RootControls(rootStatus = rootStatus, onRequestRoot = onRequestRoot)
             Spacer(modifier = Modifier.height(16.dp))
@@ -302,7 +323,8 @@ fun PwnagotchiScreenPreview() {
             onConnect = {},
             onDisconnect = {},
             onRequestRoot = {},
-            onSettings = {}
+            onSettings = {},
+            onPlugins = {}
         )
     }
 }

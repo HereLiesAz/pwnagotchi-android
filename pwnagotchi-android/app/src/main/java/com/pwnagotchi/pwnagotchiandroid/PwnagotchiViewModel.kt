@@ -28,7 +28,11 @@ data class Handshake(
 
 sealed class PwnagotchiUiState {
     data class Connecting(val message: String) : PwnagotchiUiState()
-    data class Connected(val data: String, val handshakes: List<Handshake> = emptyList()) : PwnagotchiUiState()
+    data class Connected(
+        val data: String,
+        val handshakes: List<Handshake> = emptyList(),
+        val plugins: List<Plugin> = emptyList()
+    ) : PwnagotchiUiState()
     data class Disconnected(val reason: String) : PwnagotchiUiState()
     data class Error(val message: String) : PwnagotchiUiState()
 }

@@ -8,11 +8,11 @@ This file outlines the pending tasks and future enhancements for the Pwnagotchi 
 - [ ] Implement a mechanism to display the captured handshakes.
 
 ## Medium Priority
-- [ ] Improve the UI/UX of the application.
-- [ ] Add support for notifications when a new handshake is captured.
-- [ ] Implement a mechanism to automatically reconnect to the WebSocket server.
-- [ ] Enable the user to add 3rd party plugins.
-- [ ] Create a persistent notification that displays all the things you would see on the original pi zero with that tiny little eink screen.
+- [x] Improve the UI/UX of the application.
+- [x] Add support for notifications when a new handshake is captured.
+- [x] Implement a mechanism to automatically reconnect to the WebSocket server.
+- [x] Enable the user to add 3rd party plugins.
+- [x] Create a persistent notification that displays all the things you would see on the original pi zero with that tiny little eink screen.
 
 ## Low Priority
 - [ ] Add support for themes.

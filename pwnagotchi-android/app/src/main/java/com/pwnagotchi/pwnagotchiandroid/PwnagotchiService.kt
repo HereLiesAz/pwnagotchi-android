@@ -33,6 +33,7 @@ class PwnagotchiService : Service() {
     private var reconnectionJob: Job? = null
     private var currentUri: URI? = null
     private val handshakes = mutableListOf<Handshake>()
+    private val plugins = mutableListOf<Plugin>()
 
     inner class LocalBinder : Binder() {
         fun getService(): PwnagotchiService = this@PwnagotchiService
@@ -62,16 +63,19 @@ class PwnagotchiService : Service() {
         try {
             webSocketClient = object : WebSocketClient(uri) {
                 override fun onOpen(handshakedata: ServerHandshake?) {
-                    _uiState.value = PwnagotchiUiState.Connected("Connected", handshakes)
+                    _uiState.value = PwnagotchiUiState.Connected("Connected", handshakes, plugins)
                     updateNotification("Connected to Pwnagotchi")
+                    listPlugins()
                 }
 
                 override fun onMessage(message: String?) {
                     val json = JSONObject(message)
                     when (json.getString("type")) {
                         "ui_update" -> {
-                            val data = json.getJSONObject("data").toString()
-                            _uiState.value = PwnagotchiUiState.Connected(data, handshakes)
+                            val data = json.getJSONObject("data")
+                            val notificationText = "CH: ${data.getString("channel")} | APS: ${data.getString("aps")} | UP: ${data.getString("uptime")} | PWND: ${data.getString("shakes")} | MODE: ${data.getString("mode")}"
+                            _uiState.value = PwnagotchiUiState.Connected(notificationText, handshakes, plugins)
+                            updateNotification(notificationText)
                         }
                         "handshake" -> {
                             val data = json.getJSONObject("data")
@@ -81,8 +85,21 @@ class PwnagotchiService : Service() {
                                 filename = data.getString("filename")
                             )
                             handshakes.add(handshake)
-                            _uiState.value = PwnagotchiUiState.Connected("New handshake captured!", handshakes)
+                            _uiState.value = PwnagotchiUiState.Connected("New handshake captured!", handshakes, plugins)
                             showHandshakeNotification(handshake)
+                        }
+                        "plugin_list" -> {
+                            val data = json.getJSONArray("data")
+                            plugins.clear()
+                            for (i in 0 until data.length()) {
+                                val pluginJson = data.getJSONObject(i)
+                                val plugin = Plugin(
+                                    name = pluginJson.getString("name"),
+                                    enabled = pluginJson.getBoolean("enabled")
+                                )
+                                plugins.add(plugin)
+                            }
+                            _uiState.value = PwnagotchiUiState.Connected("Plugins loaded", handshakes, plugins)
                         }
                     }
                 }
@@ -110,6 +127,14 @@ class PwnagotchiService : Service() {
         webSocketClient?.close()
         _uiState.value = PwnagotchiUiState.Disconnected("Disconnected by user")
         updateNotification("Disconnected")
+    }
+
+    fun listPlugins() {
+        webSocketClient?.send("{\"command\": \"list_plugins\"}")
+    }
+
+    fun togglePlugin(pluginName: String, enabled: Boolean) {
+        webSocketClient?.send("{\"command\": \"toggle_plugin\", \"plugin_name\": \"$pluginName\", \"enabled\": $enabled}")
     }
 
     private fun scheduleReconnect() {
@@ -147,7 +172,7 @@ class PwnagotchiService : Service() {
         }
 
         return NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Pwnagotchi Service")
+            .setContentTitle("Pwnagotchi Status")
             .setContentText(contentText)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .build()
