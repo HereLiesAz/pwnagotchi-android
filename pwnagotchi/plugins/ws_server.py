@@ -44,11 +44,13 @@ class WSServer(plugins.Plugin):
         self.loop.run_forever()
 
     def on_loaded(self):
+        # This method is called when the plugin is loaded.
         logging.info("ws_server plugin loaded.")
         self.server_thread = threading.Thread(target=self._start_server_thread)
         self.server_thread.start()
 
     def on_unload(self, ui):
+        # This method is called when the plugin is unloaded.
         if self.loop:
             self.loop.call_soon_threadsafe(self.loop.stop)
         if self.server_thread:
@@ -61,12 +63,14 @@ class WSServer(plugins.Plugin):
             asyncio.run_coroutine_threadsafe(self._broadcast(json.dumps(data, default=lambda o: '<not serializable>')), self.loop)
 
     def on_handshake(self, agent, filename, ap, sta):
+        # This method is called when a new handshake is captured.
         if self.loop and self.server:
             data = {'type': 'handshake', 'data': {'ap': ap, 'sta': sta, 'filename': filename}}
             asyncio.run_coroutine_threadsafe(self._broadcast(json.dumps(data, default=lambda o: '<not serializable>')), self.loop)
 
     async def _broadcast(self, message):
-        if self.server and self.server.websockets:
+          # Send a message to all connected clients.
+  if self.server and self.server.websockets:
             await asyncio.wait([ws.send(message) for ws in self.server.websockets])
 
     async def _send_plugin_list(self, websocket):
