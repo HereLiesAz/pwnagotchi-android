@@ -222,6 +222,8 @@ fun ConnectionStatus(uiState: PwnagotchiUiState) {
                     Text(text = uiState.message, style = MaterialTheme.typography.bodyMedium)
                 }
                 is PwnagotchiUiState.Connected -> {
+                    Text(text = uiState.face, style = MaterialTheme.typography.displayLarge)
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(text = stringResource(id = R.string.connected), style = MaterialTheme.typography.titleMedium)
                     Text(text = uiState.data, style = MaterialTheme.typography.bodyMedium)
                 }
@@ -318,7 +320,8 @@ fun PwnagotchiScreenPreview() {
                 listOf(
                     Handshake("AP1", "STA1", "file1.pcap"),
                     Handshake("AP2", "STA2", "file2.pcap")
-                )
+                ),
+                face = "(^-^)"
             ),
             rootStatus = "Root status: Unknown",
             onConnect = {},

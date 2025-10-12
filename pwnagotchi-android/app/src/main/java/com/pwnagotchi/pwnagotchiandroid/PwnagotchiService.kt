@@ -34,6 +34,7 @@ class PwnagotchiService : Service() {
     private var currentUri: URI? = null
     private val handshakes = mutableListOf<Handshake>()
     private val plugins = mutableListOf<Plugin>()
+    private var face = "(·•᷄_•᷅ ·)"
 
     inner class LocalBinder : Binder() {
         fun getService(): PwnagotchiService = this@PwnagotchiService
@@ -63,7 +64,7 @@ class PwnagotchiService : Service() {
         try {
             webSocketClient = object : WebSocketClient(uri) {
                 override fun onOpen(handshakedata: ServerHandshake?) {
-                    _uiState.value = PwnagotchiUiState.Connected("Connected", handshakes, plugins)
+                    _uiState.value = PwnagotchiUiState.Connected("Connected", handshakes, plugins, face)
                     updateNotification("Connected to Pwnagotchi")
                     listPlugins()
                 }
@@ -73,8 +74,9 @@ class PwnagotchiService : Service() {
                     when (json.getString("type")) {
                         "ui_update" -> {
                             val data = json.getJSONObject("data")
+                            face = data.getString("face")
                             val notificationText = "CH: ${data.getString("channel")} | APS: ${data.getString("aps")} | UP: ${data.getString("uptime")} | PWND: ${data.getString("shakes")} | MODE: ${data.getString("mode")}"
-                            _uiState.value = PwnagotchiUiState.Connected(notificationText, handshakes, plugins)
+                            _uiState.value = PwnagotchiUiState.Connected(notificationText, handshakes, plugins, face)
                             updateNotification(notificationText)
                         }
                         "handshake" -> {
@@ -85,7 +87,7 @@ class PwnagotchiService : Service() {
                                 filename = data.getString("filename")
                             )
                             handshakes.add(handshake)
-                            _uiState.value = PwnagotchiUiState.Connected("New handshake captured!", handshakes, plugins)
+                            _uiState.value = PwnagotchiUiState.Connected("New handshake captured!", handshakes, plugins, face)
                             showHandshakeNotification(handshake)
                         }
                         "plugin_list" -> {
@@ -99,7 +101,7 @@ class PwnagotchiService : Service() {
                                 )
                                 plugins.add(plugin)
                             }
-                            _uiState.value = PwnagotchiUiState.Connected("Plugins loaded", handshakes, plugins)
+                            _uiState.value = PwnagotchiUiState.Connected("Plugins loaded", handshakes, plugins, face)
                         }
                     }
                 }
