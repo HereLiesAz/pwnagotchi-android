@@ -11,6 +11,7 @@ This file outlines the pending tasks and future enhancements for the Pwnagotchi 
 - [ ] Improve the UI/UX of the application.
 - [ ] Add support for notifications when a new handshake is captured.
 - [ ] Implement a mechanism to automatically reconnect to the WebSocket server.
+- [ ] Enable the user to add 3rd party plugins.
 
 ## Low Priority
 - [ ] Add support for themes.
