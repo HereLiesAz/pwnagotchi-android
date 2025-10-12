@@ -3,9 +3,9 @@
 This file outlines the pending tasks and future enhancements for the Pwnagotchi Android application.
 
 ## High Priority
-- [ ] Implement a more robust error handling mechanism for the WebSocket connection.
-- [ ] Add a settings screen to configure the Pwnagotchi's IP address and other options.
-- [ ] Implement a mechanism to display the captured handshakes.
+- [x] Implement a more robust error handling mechanism for the WebSocket connection.
+- [x] Add a settings screen to configure the Pwnagotchi's IP address and other options.
+- [x] Implement a mechanism to display the captured handshakes.
 
 ## Medium Priority
 - [x] Improve the UI/UX of the application.
