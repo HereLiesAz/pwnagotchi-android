@@ -1,0 +1,46 @@
+package com.pwnagotchi.pwnagotchiandroid
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun DiscoverPluginsScreen(
+    plugins: List<CommunityPlugin>
+) {
+    LazyColumn {
+        items(plugins) { plugin ->
+            CommunityPluginItem(plugin = plugin)
+        }
+    }
+}
+
+@Composable
+fun CommunityPluginItem(
+    plugin: CommunityPlugin
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(text = plugin.name, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            Text(text = plugin.description, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+data class CommunityPlugin(
+    val name: String,
+    val description: String
+)
