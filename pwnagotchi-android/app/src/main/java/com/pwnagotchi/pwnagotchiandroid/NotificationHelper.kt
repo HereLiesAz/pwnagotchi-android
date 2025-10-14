@@ -6,9 +6,9 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.pwnagotchi.pwnagotchiandroid.R
 
 object NotificationHelper {
-
     fun createNotification(
         context: Context,
         channelId: String,
@@ -16,18 +16,20 @@ object NotificationHelper {
         contentText: String,
         importance: Int = NotificationManager.IMPORTANCE_DEFAULT
     ): Notification {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
                 channelName,
                 importance
             )
-            val manager = context.getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channel)
         }
 
         return NotificationCompat.Builder(context, channelId)
-            .setContentTitle("Pwnagotchi Service")
+            .setContentTitle("Pwnagotchi")
             .setContentText(contentText)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .build()
