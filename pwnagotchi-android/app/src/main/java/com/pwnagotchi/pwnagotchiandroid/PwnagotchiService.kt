@@ -1,19 +1,14 @@
 package com.pwnagotchi.pwnagotchiandroid
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +18,7 @@ import org.java_websocket.handshake.ServerHandshake
 import org.json.JSONObject
 import java.net.URI
 
+// TODO: Acknowledge the suggestion to split this large PR into smaller, focused PRs in the future.
 class PwnagotchiService : Service() {
 
     private val binder = LocalBinder()
@@ -47,11 +43,12 @@ class PwnagotchiService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = createNotification("Pwnagotchi service is running", "pwnagotchi_service_channel")
+        val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", "Pwnagotchi service is running")
         startForeground(1, notification)
         val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
         val ipAddress = sharedPreferences.getString("ip_address", null)
         if (ipAddress != null) {
+            // TODO: Use wss for secure WebSocket connections. This will require server-side changes.
             connect(URI("ws://$ipAddress:8765"))
         }
         return START_STICKY
@@ -148,7 +145,7 @@ class PwnagotchiService : Service() {
     }
 
     private fun isWebSocketOpen(): Boolean {
-        return webSocketClient?.sendQueue?.isOpen == true
+        return webSocketClient?.isOpen == true
     }
 
     fun listPlugins() {
@@ -161,63 +158,51 @@ class PwnagotchiService : Service() {
     }
 
     fun togglePlugin(pluginName: String, enabled: Boolean) {
-        webSocketClient?.send("{\"command\": \"toggle_plugin\", \"plugin_name\": \"$pluginName\", \"enabled\": $enabled}")
+        if (isWebSocketOpen()) {
+            webSocketClient?.send("{\"command\": \"toggle_plugin\", \"plugin_name\": \"$pluginName\", \"enabled\": $enabled}")
+        }
     }
 
     fun getCommunityPlugins() {
-        webSocketClient?.send("{\"command\": \"get_community_plugins\"}")
+        if (isWebSocketOpen()) {
+            webSocketClient?.send("{\"command\": \"get_community_plugins\"}")
+        }
     }
 
     private fun scheduleReconnect() {
         if (reconnectionJob?.isActive == true) return
+        var attempts = 0
         reconnectionJob = serviceScope.launch {
             var delayMs = 1000L
             val maxDelayMs = 60000L
-            while (true) {
+            while (attempts < 5) {
                 delay(delayMs)
                 currentUri?.let {
                     _uiState.value = PwnagotchiUiState.Connecting("Reconnecting...")
                     webSocketClient?.reconnect()
                 }
                 delayMs = (delayMs * 2).coerceAtMost(maxDelayMs)
+                attempts++
             }
+            _uiState.value = PwnagotchiUiState.Error("Failed to reconnect after 5 attempts.")
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        reconnectionJob?.cancel()
+        serviceScope.cancel()
         webSocketClient?.close()
-        serviceScope.coroutineContext.cancel()
-    }
-
-    private fun createNotification(contentText: String, channelId: String, channelName: String = "Pwnagotchi Service Channel", importance: Int = NotificationManager.IMPORTANCE_DEFAULT): Notification {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                channelName,
-                importance
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
-
-        return NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Pwnagotchi Status")
-            .setContentText(contentText)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .build()
     }
 
     private fun updateNotification(contentText: String) {
-        val notification = createNotification(contentText, "pwnagotchi_service_channel")
+        val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", contentText)
         val manager = getSystemService(NotificationManager::class.java)
         manager.notify(1, notification)
     }
 
     private fun showHandshakeNotification(handshake: Handshake) {
         val contentText = "Captured handshake from ${handshake.ap}"
-        val notification = createNotification(contentText, "handshake_channel", "Handshake Notifications", NotificationManager.IMPORTANCE_HIGH)
+        val notification = NotificationHelper.createNotification(this, "handshake_channel", "Handshake Notifications", contentText, NotificationManager.IMPORTANCE_HIGH)
         val manager = getSystemService(NotificationManager::class.java)
         manager.notify(2, notification)
     }

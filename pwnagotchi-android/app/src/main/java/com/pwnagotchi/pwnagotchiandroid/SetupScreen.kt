@@ -54,10 +54,19 @@ fun SetupScreen(onSetupComplete: () -> Unit) {
             null -> {
                 Text("Step 1: Check for bettercap")
                 Button(onClick = {
-                    Shell.cmd("which bettercap && bettercap -version").to(mutableListOf(), mutableListOf()).exec { result ->
-                        bettercapInstalled = result.isSuccess
-                        if (!result.isSuccess) {
-                            setupError = "bettercap not found or not executable. Please install it and make sure it's in your PATH."
+                    // First check if bettercap is in PATH
+                    Shell.cmd("which bettercap").to(mutableListOf(), mutableListOf()).exec { whichResult ->
+                        if (!whichResult.isSuccess) {
+                            bettercapInstalled = false
+                            setupError = "bettercap not found in PATH. Please install it and make sure it's in your PATH."
+                        } else {
+                            // If found, check if it is executable and get version
+                            Shell.cmd("bettercap -version").to(mutableListOf(), mutableListOf()).exec { versionResult ->
+                                bettercapInstalled = versionResult.isSuccess
+                                if (!versionResult.isSuccess) {
+                                    setupError = "bettercap found but not executable or version check failed. Please ensure it is installed correctly."
+                                }
+                            }
                         }
                     }
                 }) {
@@ -81,14 +90,18 @@ fun SetupScreen(onSetupComplete: () -> Unit) {
                         "nexmon" -> "nexutil -m2"
                         else -> ""
                     }
-                    Shell.cmd("ip link set $interfaceName down", command, "ip link set $interfaceName up").to(mutableListOf(), mutableListOf()).exec { result ->
-                        if (result.isSuccess) {
-                            val intent = Intent(context, BettercapService::class.java)
-                            context.startService(intent)
-                            onSetupComplete()
-                        } else {
-                            setupError = "Failed to enable monitor mode. Your device may not be supported."
+                    if (command.isNotEmpty()) {
+                        Shell.cmd("ip link set $interfaceName down", command, "ip link set $interfaceName up").to(mutableListOf(), mutableListOf()).exec { result ->
+                            if (result.isSuccess) {
+                                val intent = Intent(context, BettercapService::class.java)
+                                context.startService(intent)
+                                onSetupComplete()
+                            } else {
+                                setupError = "Failed to enable monitor mode. Your device may not be supported."
+                            }
                         }
+                    } else {
+                        setupError = "Please select a monitor mode method."
                     }
                 }) {
                     Text("Run Setup")

@@ -67,8 +67,12 @@ class WSServer(plugins.Plugin):
 
     def on_ui_update(self, ui):
         if self.loop and self.server:
-            data = {'type': 'ui_update', 'data': ui._state._state}
-            asyncio.run_coroutine_threadsafe(self._broadcast(json.dumps(data, default=lambda o: '<not serializable>')), self.loop)
+            # Select only safe and serializable fields to broadcast
+            state = ui._state._state
+            safe_fields = ['channel', 'aps', 'uptime', 'shakes', 'mode', 'face', 'status']
+            sanitized_state = {k: state[k]['value'] for k in safe_fields if k in state}
+            data = {'type': 'ui_update', 'data': sanitized_state}
+            asyncio.run_coroutine_threadsafe(self._broadcast(json.dumps(data)), self.loop)
 
     def on_handshake(self, agent, filename, ap, sta):
         if self.loop and self.server:

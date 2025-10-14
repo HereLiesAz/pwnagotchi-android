@@ -32,8 +32,11 @@ class PwnagotchiWidget : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.pwnagotchi_widget)
             views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent)
 
-            // TODO: Parse the face from the status string
-            views.setTextViewText(R.id.widget_face, "(·•᷄_•᷅ ·)")
+            val faceRegex = Regex("""\(.+?\)""")
+            val faceMatch = faceRegex.find(status)
+            val face = faceMatch?.value ?: "(·•᷄_•᷅ ·)"
+
+            views.setTextViewText(R.id.widget_face, face)
             views.setTextViewText(R.id.widget_status, status)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)

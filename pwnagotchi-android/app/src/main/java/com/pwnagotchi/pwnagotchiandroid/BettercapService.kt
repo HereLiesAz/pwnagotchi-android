@@ -1,6 +1,11 @@
 package com.pwnagotchi.pwnagotchiandroid
 
 import android.app.Notification
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.os.Binder
+import android.os.IBinder
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -34,16 +39,7 @@ class BettercapService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val channelId = "bettercap_service_channel"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Bettercap Service Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
+        // The channel creation is now handled by the NotificationHelper
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -51,7 +47,7 @@ class BettercapService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = createNotification("Bettercap service is running")
+        val notification = NotificationHelper.createNotification(this, "bettercap_service_channel", "Bettercap Service Channel", "Bettercap service is running")
         startForeground(1, notification)
         startBettercap()
         return START_STICKY
@@ -92,14 +88,5 @@ class BettercapService : Service() {
         serviceJob.cancel()
         stopForeground(true)
         stopSelf()
-    }
-
-    private fun createNotification(contentText: String): Notification {
-        val channelId = "bettercap_service_channel"
-        return NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Bettercap Service")
-            .setContentText(contentText)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .build()
     }
 }
