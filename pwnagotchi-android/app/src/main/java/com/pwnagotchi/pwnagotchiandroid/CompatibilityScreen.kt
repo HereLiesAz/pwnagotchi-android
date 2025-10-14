@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.pwnagotchi.pwnagotchiandroid.utils.NetworkUtils
 import com.topjohnwu.superuser.Shell
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +35,7 @@ fun CompatibilityScreen(onNavigateToSetup: () -> Unit) {
         context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
     }
     var interfaceName by remember {
-        mutableStateOf(sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0")
+        mutableStateOf(sharedPreferences.getString("interface_name", NetworkUtils.getWifiInterfaceName()) ?: NetworkUtils.getWifiInterfaceName())
     }
 
     Column(
