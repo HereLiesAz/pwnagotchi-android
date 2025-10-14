@@ -11,18 +11,18 @@ This document outlines the step-by-step roadmap to take the Pwnagotchi Android S
 - [x] **Native Mode:** Provide a selection of monitor mode commands or detect chipset to improve compatibility.
 - [x] **Native Mode:** Add comprehensive error handling to the `bettercap` service, capturing stderr and displaying user-friendly error messages.
 - [x] **Client Mode:** Implement a limit on WebSocket reconnection attempts to prevent infinite loops.
-- [ ] **Client Mode:** Add checks to ensure WebSocket is open before sending any commands.
+- [x] **Client Mode:** Add checks to ensure WebSocket is open before sending any commands.
 
 ### 1.2: Security Hardening
-- [ ] **Client Mode:** Implement `wss://` (secure WebSockets) support in the `ws_server.py` plugin and the Android client. This will require generating self-signed SSL certificates.
-- [ ] **Client Mode:** Add a configuration option to the Python plugin to bind the WebSocket server to `localhost` by default for enhanced security.
-- [ ] **Native Mode:** Thoroughly validate all user-provided input (like interface names) to prevent any potential for command injection.
+- [x] **Client Mode:** Implement `wss://` (secure WebSockets) support in the `ws_server.py` plugin and the Android client. This will require generating self-signed SSL certificates.
+- [x] **Client Mode:** Add a configuration option to the Python plugin to bind the WebSocket server to `localhost` by default for enhanced security.
+- [x] **Native Mode:** Thoroughly validate all user-provided input (like interface names) to prevent any potential for command injection.
 
 ### 1.3: UI Polish & UX Refinement
-- [ ] Implement a proper navigation architecture using the **Jetpack Navigation Component** to replace the current boolean-based routing.
-- [ ] Refine the layout of all screens for better visual consistency and usability.
-- [ ] Add loading indicators for all asynchronous operations (e.g., fetching plugin lists).
-- [ ] Create a more intuitive settings screen, grouping related options.
+- [x] Implement a proper navigation architecture using the **Jetpack Navigation Component** to replace the current boolean-based routing.
+- [x] Refine the layout of all screens for better visual consistency and usability.
+- [x] Add loading indicators for all asynchronous operations (e.g., fetching plugin lists).
+- [x] Create a more intuitive settings screen, grouping related options.
 
 ---
 
