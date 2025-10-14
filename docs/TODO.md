@@ -10,7 +10,7 @@ This document outlines the step-by-step roadmap to take the Pwnagotchi Android S
 - [x] **Native Mode:** Implement a dynamic check for WiFi interface names instead of hardcoding `wlan0`.
 - [x] **Native Mode:** Provide a selection of monitor mode commands or detect chipset to improve compatibility.
 - [x] **Native Mode:** Add comprehensive error handling to the `bettercap` service, capturing stderr and displaying user-friendly error messages.
-- [ ] **Client Mode:** Implement a limit on WebSocket reconnection attempts to prevent infinite loops.
+- [x] **Client Mode:** Implement a limit on WebSocket reconnection attempts to prevent infinite loops.
 - [ ] **Client Mode:** Add checks to ensure WebSocket is open before sending any commands.
 
 ### 1.2: Security Hardening

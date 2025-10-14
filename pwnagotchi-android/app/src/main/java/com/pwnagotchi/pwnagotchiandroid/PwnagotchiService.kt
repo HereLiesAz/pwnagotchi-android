@@ -29,6 +29,7 @@ class PwnagotchiService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
     private var reconnectionJob: Job? = null
     private var currentUri: URI? = null
+    private val maxReconnectionAttempts = 5
     private val handshakes = mutableListOf<Handshake>()
     private val plugins = mutableListOf<Plugin>()
     private val communityPlugins = mutableListOf<CommunityPlugin>()
@@ -152,18 +153,24 @@ class PwnagotchiService : Service() {
     fun listPlugins() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"list_plugins\"}")
+        } else {
+            _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
         }
     }
 
     fun togglePlugin(pluginName: String, enabled: Boolean) {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"toggle_plugin\", \"plugin_name\": \"$pluginName\", \"enabled\": $enabled}")
+        } else {
+            _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
         }
     }
 
     fun getCommunityPlugins() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"get_community_plugins\"}")
+        } else {
+            _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
         }
     }
 
@@ -173,16 +180,16 @@ class PwnagotchiService : Service() {
         reconnectionJob = serviceScope.launch {
             var delayMs = 1000L
             val maxDelayMs = 60000L
-            while (attempts < 5) {
+            while (attempts < maxReconnectionAttempts) {
+                _uiState.value = PwnagotchiUiState.Connecting("Reconnection attempt ${attempts + 1} of $maxReconnectionAttempts...")
                 delay(delayMs)
                 currentUri?.let {
-                    _uiState.value = PwnagotchiUiState.Connecting("Reconnecting...")
-                    connect(it)
+                    webSocketClient?.reconnect()
                 }
                 delayMs = (delayMs * 2).coerceAtMost(maxDelayMs)
                 attempts++
             }
-            _uiState.value = PwnagotchiUiState.Error("Failed to reconnect after 5 attempts.")
+            _uiState.value = PwnagotchiUiState.Error("Failed to reconnect after $maxReconnectionAttempts attempts.")
         }
     }
 
