@@ -29,6 +29,20 @@ class BettercapService : Service() {
         fun getService(): BettercapService = this@BettercapService
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        val channelId = "bettercap_service_channel"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Bettercap Service Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
     override fun onBind(intent: Intent): IBinder {
         return binder
     }
@@ -42,29 +56,29 @@ class BettercapService : Service() {
 
     private fun startBettercap() {
         serviceScope.launch {
-            Shell.cmd("bettercap -iface wlan0 -caplet pwnagotchi-auto").to(mutableListOf(), mutableListOf()).exec { result ->
-                _uiState.value = result.out.joinToString("\n")
-            }
+            val outputBuffer = StringBuilder()
+            Shell.cmd("bettercap -iface wlan0 -caplet pwnagotchi-auto")
+                .to(mutableListOf(), mutableListOf())
+                .exec { result ->
+                    // This is still not a true stream, but it's an improvement.
+                    // A true stream would require a different approach with Shell.p.open.
+                    result.out.forEach { line ->
+                        outputBuffer.append(line).append("\n")
+                        _uiState.value = outputBuffer.toString()
+                    }
+                }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         serviceJob.cancel()
+        stopForeground(true)
+        stopSelf()
     }
 
     private fun createNotification(contentText: String): Notification {
         val channelId = "bettercap_service_channel"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Bettercap Service Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
-
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Bettercap Service")
             .setContentText(contentText)

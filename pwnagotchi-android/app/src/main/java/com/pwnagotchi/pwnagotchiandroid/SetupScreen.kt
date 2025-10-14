@@ -25,7 +25,8 @@ import com.topjohnwu.superuser.Shell
 @Composable
 fun SetupScreen(onSetupComplete: () -> Unit) {
     val context = LocalContext.current
-    var bettercapInstalled by remember { mutableStateOf(false) }
+    var bettercapInstalled by remember { mutableStateOf<Boolean?>(null) }
+    var setupError by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -41,33 +42,50 @@ fun SetupScreen(onSetupComplete: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
         Text("This screen will guide you through the process of setting up your device to run as a Pwnagotchi.")
         Spacer(modifier = Modifier.height(16.dp))
-        if (!bettercapInstalled) {
-            Text("Step 1: Install bettercap")
-            Text("You will need to install bettercap for your device's architecture. You can find instructions on the bettercap website.")
-            Button(onClick = {
-                Shell.cmd("which bettercap").to(mutableListOf(), mutableListOf()).exec { result ->
-                    bettercapInstalled = result.isSuccess
+        when (bettercapInstalled) {
+            null -> {
+                Text("Step 1: Check for bettercap")
+                Button(onClick = {
+                    Shell.cmd("which bettercap && bettercap -version").to(mutableListOf(), mutableListOf()).exec { result ->
+                        bettercapInstalled = result.isSuccess
+                        if (!result.isSuccess) {
+                            setupError = "bettercap not found or not executable. Please install it and make sure it's in your PATH."
+                        }
+                    }
+                }) {
+                    Text("Check for bettercap")
                 }
-            }) {
-                Text("Check for bettercap")
             }
-        } else {
-            Text("bettercap is installed!")
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Step 2: Enable monitor mode")
-            Text("The following commands will be run to enable monitor mode:")
-            Text("ip link set wlan0 down")
-            Text("echo 4 > /sys/module/wlan/parameters/con_mode")
-            Text("ip link set wlan0 up")
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                Shell.cmd("ip link set wlan0 down", "echo 4 > /sys/module/wlan/parameters/con_mode", "ip link set wlan0 up").exec()
-                val intent = Intent(context, BettercapService::class.java)
-                context.startService(intent)
-                onSetupComplete()
-            }) {
-                Text("Run Setup")
+            true -> {
+                Text("bettercap is installed!")
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Step 2: Enable monitor mode")
+                Text("The following commands will be run to enable monitor mode:")
+                Text("ip link set wlan0 down")
+                Text("echo 4 > /sys/module/wlan/parameters/con_mode")
+                Text("ip link set wlan0 up")
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = {
+                    Shell.cmd("ip link set wlan0 down", "echo 4 > /sys/module/wlan/parameters/con_mode", "ip link set wlan0 up").to(mutableListOf(), mutableListOf()).exec { result ->
+                        if (result.isSuccess) {
+                            val intent = Intent(context, BettercapService::class.java)
+                            context.startService(intent)
+                            onSetupComplete()
+                        } else {
+                            setupError = "Failed to enable monitor mode. Your device may not be supported."
+                        }
+                    }
+                }) {
+                    Text("Run Setup")
+                }
             }
+            false -> {
+                Text("bettercap not found. Please install it and make sure it's in your PATH.")
+            }
+        }
+        setupError?.let {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(it, color = MaterialTheme.colorScheme.error)
         }
     }
 }
