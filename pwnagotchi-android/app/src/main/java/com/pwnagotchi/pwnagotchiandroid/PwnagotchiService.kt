@@ -147,8 +147,17 @@ class PwnagotchiService : Service() {
         updateNotification("Disconnected")
     }
 
+    private fun isWebSocketOpen(): Boolean {
+        return webSocketClient?.sendQueue?.isOpen == true
+    }
+
     fun listPlugins() {
-        webSocketClient?.send("{\"command\": \"list_plugins\"}")
+        if (isWebSocketOpen()) {
+            webSocketClient?.send("{\"command\": \"list_plugins\"}")
+        } else {
+            // Optionally handle the case when the WebSocket is not open
+            // e.g., log, show a message, or attempt reconnection
+        }
     }
 
     fun togglePlugin(pluginName: String, enabled: Boolean) {
