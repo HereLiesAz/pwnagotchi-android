@@ -4,6 +4,8 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
@@ -65,6 +67,7 @@ class BettercapService : Service() {
                 override fun add(element: String): Boolean {
                     outputBuffer.append(element).append("\n")
                     _uiState.value = outputBuffer.toString()
+                    updateWidget(outputBuffer.toString())
                     return true
                 }
             }
@@ -73,6 +76,16 @@ class BettercapService : Service() {
                 .submit()
         }
     }
+
+    private fun updateWidget(status: String) {
+        val appWidgetManager = AppWidgetManager.getInstance(this)
+        val thisAppWidget = ComponentName(this, PwnagotchiWidget::class.java)
+        val appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget)
+        for (appWidgetId in appWidgetIds) {
+            PwnagotchiWidget.updateAppWidget(this, appWidgetManager, appWidgetId, status)
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
