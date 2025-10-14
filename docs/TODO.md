@@ -7,7 +7,7 @@ This document outlines the step-by-step roadmap to take the Pwnagotchi Android S
 ## Phase 1: Stabilize Core Features & Address Feedback
 
 ### 1.1: Robustness & Error Handling
-- [ ] **Native Mode:** Implement a dynamic check for WiFi interface names instead of hardcoding `wlan0`.
+- [x] **Native Mode:** Implement a dynamic check for WiFi interface names instead of hardcoding `wlan0`.
 - [ ] **Native Mode:** Provide a selection of monitor mode commands or detect chipset to improve compatibility.
 - [ ] **Native Mode:** Add comprehensive error handling to the `bettercap` service, capturing stderr and displaying user-friendly error messages.
 - [ ] **Client Mode:** Implement a limit on WebSocket reconnection attempts to prevent infinite loops.

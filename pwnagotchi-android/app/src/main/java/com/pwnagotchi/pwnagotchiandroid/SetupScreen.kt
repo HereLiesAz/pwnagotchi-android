@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.pwnagotchi.pwnagotchiandroid.utils.NetworkUtils
 import com.topjohnwu.superuser.Shell
 
 @Composable
@@ -30,7 +31,7 @@ fun SetupScreen(onSetupComplete: () -> Unit) {
     val sharedPreferences = remember {
         context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
     }
-    val unsafeInterfaceName = sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0"
+    val unsafeInterfaceName = sharedPreferences.getString("interface_name", NetworkUtils.getWifiInterfaceName()) ?: NetworkUtils.getWifiInterfaceName()
     val interfaceName = unsafeInterfaceName.filter { it.isLetterOrDigit() }
     var selectedMethod by remember { mutableStateOf("qualcomm") }
     var setupError by remember { mutableStateOf<String?>(null) }
