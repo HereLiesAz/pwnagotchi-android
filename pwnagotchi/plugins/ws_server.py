@@ -78,9 +78,10 @@ class WSServer(plugins.Plugin):
             await asyncio.wait([ws.send(message) for ws in self.server.websockets])
 
     async def _send_plugin_list(self, websocket):
-        plugin_list = []
-        for name, loaded in plugins.database.items():
-            plugin_list.append({"name": name, "enabled": name in plugins.loaded})
+        plugin_list = [
+            {"name": name, "enabled": name in plugins.loaded}
+            for name, loaded in plugins.database.items()
+        ]
         await websocket.send(json.dumps({"type": "plugin_list", "data": plugin_list}))
 
     def _toggle_plugin(self, plugin_name, enabled):
