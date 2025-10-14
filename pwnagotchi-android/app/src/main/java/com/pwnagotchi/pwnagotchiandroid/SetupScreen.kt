@@ -1,14 +1,17 @@
 package com.pwnagotchi.pwnagotchiandroid
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,15 +21,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.topjohnwu.superuser.Shell
 
 @Composable
 fun SetupScreen(onSetupComplete: () -> Unit) {
     val context = LocalContext.current
-    var bettercapInstalled by remember { mutableStateOf<Boolean?>(null) }
+    val sharedPreferences = remember {
+        context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+    }
+    val interfaceName = sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0"
+    var selectedMethod by remember { mutableStateOf("qualcomm") }
     var setupError by remember { mutableStateOf<String?>(null) }
+    var bettercapInstalled by remember { mutableStateOf<Boolean?>(null) }
+
 
     Column(
         modifier = Modifier
@@ -59,14 +67,21 @@ fun SetupScreen(onSetupComplete: () -> Unit) {
             true -> {
                 Text("bettercap is installed!")
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Step 2: Enable monitor mode")
-                Text("The following commands will be run to enable monitor mode:")
-                Text("ip link set wlan0 down")
-                Text("echo 4 > /sys/module/wlan/parameters/con_mode")
-                Text("ip link set wlan0 up")
+                Text("Step 2: Select Monitor Mode Method")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(selected = selectedMethod == "qualcomm", onClick = { selectedMethod = "qualcomm" })
+                    Text("Qualcomm")
+                    RadioButton(selected = selectedMethod == "nexmon", onClick = { selectedMethod = "nexmon" })
+                    Text("Nexmon")
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
-                    Shell.cmd("ip link set wlan0 down", "echo 4 > /sys/module/wlan/parameters/con_mode", "ip link set wlan0 up").to(mutableListOf(), mutableListOf()).exec { result ->
+                    val command = when (selectedMethod) {
+                        "qualcomm" -> "echo 4 > /sys/module/wlan/parameters/con_mode"
+                        "nexmon" -> "nexutil -m2"
+                        else -> ""
+                    }
+                    Shell.cmd("ip link set $interfaceName down", command, "ip link set $interfaceName up").to(mutableListOf(), mutableListOf()).exec { result ->
                         if (result.isSuccess) {
                             val intent = Intent(context, BettercapService::class.java)
                             context.startService(intent)

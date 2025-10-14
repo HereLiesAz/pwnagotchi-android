@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
@@ -56,17 +57,20 @@ class BettercapService : Service() {
 
     private fun startBettercap() {
         serviceScope.launch {
+            val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+            val interfaceName = sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0"
             val outputBuffer = StringBuilder()
-            Shell.cmd("bettercap -iface wlan0 -caplet pwnagotchi-auto")
-                .to(mutableListOf(), mutableListOf())
-                .exec { result ->
-                    // This is still not a true stream, but it's an improvement.
-                    // A true stream would require a different approach with Shell.p.open.
-                    result.out.forEach { line ->
-                        outputBuffer.append(line).append("\n")
-                        _uiState.value = outputBuffer.toString()
-                    }
+            _uiState.value = "" // Start with empty output
+            val streamOutput = object : MutableList<String> by mutableListOf() {
+                override fun add(element: String): Boolean {
+                    outputBuffer.append(element).append("\n")
+                    _uiState.value = outputBuffer.toString()
+                    return true
                 }
+            }
+            Shell.cmd("bettercap -iface $interfaceName -caplet pwnagotchi-auto")
+                .to(streamOutput, streamOutput)
+                .submit()
         }
     }
 
