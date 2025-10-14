@@ -151,6 +151,9 @@ class PwnagotchiService : Service() {
     fun listPlugins() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"list_plugins\"}")
+        } else {
+            // Optionally handle the case when the WebSocket is not open
+            // e.g., log, show a message, or attempt reconnection
         }
     }
 
