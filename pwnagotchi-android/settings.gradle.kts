@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Pwnagotchi Android"
-include(":app")
+include(":pwnagotchi-android")
