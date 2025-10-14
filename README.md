@@ -1,3 +1,9 @@
+# Pwnagotchi: Android Edition
+
+This project is a port of the original Pwnagotchi to the Android platform. The goal is to create an application that turns a compatible Android device into a fully-functional Pwnagotchi, using the device's own hardware to perform WiFi scanning and capture handshakes.
+
+**This is a work in progress and is not yet functional.**
+
 <p align="center">
   <small>Join the project community on our server!</small>
   <br/><br/>
