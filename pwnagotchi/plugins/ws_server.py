@@ -60,7 +60,9 @@ class WSServer(plugins.Plugin):
         if self.loop:
             self.loop.call_soon_threadsafe(self.loop.stop)
         if self.server_thread:
-            self.server_thread.join()
+            self.server_thread.join(timeout=5)
+            if self.server_thread.is_alive():
+                logging.warning("WebSocket server thread did not exit within timeout.")
         logging.info("WebSocket server stopped.")
 
     def on_ui_update(self, ui):
