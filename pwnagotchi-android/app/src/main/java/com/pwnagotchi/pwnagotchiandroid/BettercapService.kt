@@ -51,19 +51,32 @@ class BettercapService : Service() {
 
             val outputBuffer = mutableListOf<String>()
             _uiState.value = "" // Start with empty output
+
+            val stdHandler = { element: String ->
+                outputBuffer.add(element)
+                if (outputBuffer.size > 100) {
+                    outputBuffer.removeAt(0)
+                }
+                _uiState.value = outputBuffer.joinToString("\n")
+                updateWidget(outputBuffer.joinToString("\n"))
+            }
+
             val streamOutput = object : MutableList<String> by mutableListOf() {
                 override fun add(element: String): Boolean {
-                    outputBuffer.add(element)
-                    if (outputBuffer.size > 100) {
-                        outputBuffer.removeAt(0)
-                    }
-                    _uiState.value = outputBuffer.joinToString("\n")
-                    updateWidget(outputBuffer.joinToString("\n"))
+                    stdHandler(element)
                     return true
                 }
             }
+
+            val errorStreamOutput = object : MutableList<String> by mutableListOf() {
+                override fun add(element: String): Boolean {
+                    stdHandler("[ERROR] $element")
+                    return true
+                }
+            }
+
             Shell.cmd("bettercap -iface $interfaceName -caplet pwnagotchi-auto")
-                .to(streamOutput, streamOutput)
+                .to(streamOutput, errorStreamOutput)
                 .submit()
         }
     }

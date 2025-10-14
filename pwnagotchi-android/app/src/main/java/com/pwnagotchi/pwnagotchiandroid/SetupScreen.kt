@@ -10,9 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +38,13 @@ fun SetupScreen(onSetupComplete: () -> Unit) {
     }
     val unsafeInterfaceName = sharedPreferences.getString("interface_name", NetworkUtils.getWifiInterfaceName()) ?: NetworkUtils.getWifiInterfaceName()
     val interfaceName = unsafeInterfaceName.filter { it.isLetterOrDigit() }
-    var selectedMethod by remember { mutableStateOf("qualcomm") }
+    val monitorOptions = mapOf(
+        "qualcomm" to "Qualcomm (wlan_qc)",
+        "nexmon" to "Nexmon (bcm)",
+        "iw" to "iw (Standard)"
+    )
+    var expanded by remember { mutableStateOf(false) }
+    var selectedMethod by remember { mutableStateOf(monitorOptions.keys.first()) }
     var setupError by remember { mutableStateOf<String?>(null) }
     var bettercapInstalled by remember { mutableStateOf<Boolean?>(null) }
 
@@ -79,17 +90,39 @@ fun SetupScreen(onSetupComplete: () -> Unit) {
                 Text("bettercap is installed!")
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Step 2: Select Monitor Mode Method")
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(selected = selectedMethod == "qualcomm", onClick = { selectedMethod = "qualcomm" })
-                    Text("Qualcomm")
-                    RadioButton(selected = selectedMethod == "nexmon", onClick = { selectedMethod = "nexmon" })
-                    Text("Nexmon")
+                @OptIn(ExperimentalMaterial3Api::class)
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    TextField(
+                        value = monitorOptions[selectedMethod] ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        monitorOptions.forEach { (key, text) ->
+                            DropdownMenuItem(
+                                text = { Text(text) },
+                                onClick = {
+                                    selectedMethod = key
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
                     val command = when (selectedMethod) {
                         "qualcomm" -> "echo 4 > /sys/module/wlan/parameters/con_mode"
                         "nexmon" -> "nexutil -m2"
+                        "iw" -> "iw dev $interfaceName set type monitor"
                         else -> ""
                     }
                     if (command.isNotEmpty()) {
