@@ -32,7 +32,7 @@ class PwnagotchiWidget : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.pwnagotchi_widget)
             views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent)
 
-            val faceRegex = Regex("""\(.+?\)""")
+            val faceRegex = Regex("""\(.+\)""")
             val faceMatch = faceRegex.find(status)
             val face = faceMatch?.value ?: "(·•᷄_•᷅ ·)"
 

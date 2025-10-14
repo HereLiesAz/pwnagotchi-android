@@ -19,8 +19,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
 
-// TODO: Refactor navigation to use Jetpack Navigation for better readability and maintainability.
-// This is a significant architectural change that will be addressed in a future task.
+// TODO: (Architectural) Refactor navigation to use Jetpack Navigation.
+// The current navigation is handled by mutable boolean states, which is not scalable.
+// Adopting the Jetpack Navigation Component will make the navigation logic more robust,
+// scalable, and easier to understand and maintain. This is a significant architectural
+// change that will be addressed in a future task.
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
     private var bettercapService: BettercapService? = null
@@ -49,7 +52,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     var showSetup by remember { mutableStateOf(false) }
-                    var showMain by remember { mutableState of(false) }
+                    var showMain by remember { mutableStateOf(false) }
 
                     when {
                         showMain -> MainScreen(viewModel)

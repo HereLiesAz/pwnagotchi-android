@@ -30,7 +30,8 @@ fun SetupScreen(onSetupComplete: () -> Unit) {
     val sharedPreferences = remember {
         context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
     }
-    val interfaceName = sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0"
+    val unsafeInterfaceName = sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0"
+    val interfaceName = unsafeInterfaceName.filter { it.isLetterOrDigit() }
     var selectedMethod by remember { mutableStateOf("qualcomm") }
     var setupError by remember { mutableStateOf<String?>(null) }
     var bettercapInstalled by remember { mutableStateOf<Boolean?>(null) }

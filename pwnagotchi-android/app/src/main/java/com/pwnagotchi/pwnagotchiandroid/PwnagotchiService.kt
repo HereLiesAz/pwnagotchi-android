@@ -47,9 +47,10 @@ class PwnagotchiService : Service() {
         startForeground(1, notification)
         val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
         val ipAddress = sharedPreferences.getString("ip_address", null)
+        val host = sharedPreferences.getString("host", "127.0.0.1") ?: "127.0.0.1"
         if (ipAddress != null) {
             // TODO: Use wss for secure WebSocket connections. This will require server-side changes.
-            connect(URI("ws://$ipAddress:8765"))
+            connect(URI("ws://$host:8765"))
         }
         return START_STICKY
     }
@@ -151,9 +152,6 @@ class PwnagotchiService : Service() {
     fun listPlugins() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"list_plugins\"}")
-        } else {
-            // Optionally handle the case when the WebSocket is not open
-            // e.g., log, show a message, or attempt reconnection
         }
     }
 
@@ -179,7 +177,7 @@ class PwnagotchiService : Service() {
                 delay(delayMs)
                 currentUri?.let {
                     _uiState.value = PwnagotchiUiState.Connecting("Reconnecting...")
-                    webSocketClient?.reconnect()
+                    connect(it)
                 }
                 delayMs = (delayMs * 2).coerceAtMost(maxDelayMs)
                 attempts++

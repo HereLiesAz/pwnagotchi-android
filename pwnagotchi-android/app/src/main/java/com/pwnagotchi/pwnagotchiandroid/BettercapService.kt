@@ -6,17 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
-import androidx.core.app.NotificationCompat
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +28,7 @@ class BettercapService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        // The channel creation is now handled by the NotificationHelper
+        // Notification channel is created by the helper
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -56,14 +45,19 @@ class BettercapService : Service() {
     private fun startBettercap() {
         serviceScope.launch {
             val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-            val interfaceName = sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0"
-            val outputBuffer = StringBuilder()
+            val unsafeInterfaceName = sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0"
+            val interfaceName = unsafeInterfaceName.filter { it.isLetterOrDigit() }
+
+            val outputBuffer = mutableListOf<String>()
             _uiState.value = "" // Start with empty output
             val streamOutput = object : MutableList<String> by mutableListOf() {
                 override fun add(element: String): Boolean {
-                    outputBuffer.append(element).append("\n")
-                    _uiState.value = outputBuffer.toString()
-                    updateWidget(outputBuffer.toString())
+                    outputBuffer.add(element)
+                    if (outputBuffer.size > 100) {
+                        outputBuffer.removeAt(0)
+                    }
+                    _uiState.value = outputBuffer.joinToString("\n")
+                    updateWidget(outputBuffer.joinToString("\n"))
                     return true
                 }
             }

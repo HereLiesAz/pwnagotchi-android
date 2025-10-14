@@ -47,7 +47,9 @@ class WSServer(plugins.Plugin):
     def _start_server_thread(self):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
-        self.server = websockets.serve(self._server_handler, "0.0.0.0", 8765)
+        host = self.options.get('host', '127.0.0.1')
+        port = self.options.get('port', 8765)
+        self.server = websockets.serve(self._server_handler, host, port)
         self.loop.run_until_complete(self.server)
         self.loop.run_forever()
 
@@ -67,7 +69,9 @@ class WSServer(plugins.Plugin):
 
     def on_ui_update(self, ui):
         if self.loop and self.server:
-            # Select only safe and serializable fields to broadcast
+            # NOTE: Accessing the private _state member is not ideal, but it's the most
+            # direct way to get the full UI state. This could break in future versions
+            # of Pwnagotchi if the internal implementation changes.
             state = ui._state._state
             safe_fields = ['channel', 'aps', 'uptime', 'shakes', 'mode', 'face', 'status']
             sanitized_state = {k: state[k]['value'] for k in safe_fields if k in state}
