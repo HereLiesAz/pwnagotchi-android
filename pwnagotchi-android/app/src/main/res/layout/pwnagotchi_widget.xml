@@ -1,0 +1,27 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#09C"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/widget_face"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="(·•᷄_•᷅ ·)"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/widget_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_face"
+        android:layout_centerHorizontal="true"
+        android:text="Status: Unknown"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp" />
+
+</RelativeLayout>
