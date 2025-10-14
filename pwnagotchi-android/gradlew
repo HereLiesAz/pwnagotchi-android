@@ -1,0 +1,111 @@
+#!/usr/bin/env sh
+
+#
+# Copyright 2015 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# @author...
+#
+
+#
+# A script for executing Gradle builds, that first automatically downloads and
+# installs the appropriate Gradle distribution.
+#
+# You can normally just use this script in place of the `gradle` command.
+# For example, `gradlew build` runs the `build` task.
+#
+# You can also set the following environment variables:
+#
+# - `GRADLE_HOME` - the path to a Gradle installation. If set, this script
+#   will use it instead of downloading a new distribution.
+#
+# - `GRADLE_OPTS` - the command-line options to pass to the `java` command
+#   when running Gradle.
+#
+# - `JAVA_HOME` - the path to a Java installation. If set, this script will
+#   use it to run Gradle.
+#
+
+#
+# Set `-e` so that this script will fail if any of the commands fail.
+#
+set -e
+
+#
+# Resolve the location of the `java` command.
+#
+if [ -n "$JAVA_HOME" ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+        #
+        # IBM's JDK on AIX uses strange locations for the executables
+        #
+        JAVACMD="$JAVA_HOME/jre/sh/java"
+    else
+        JAVACMD="$JAVA_HOME/bin/java"
+    fi
+    if [ ! -x "$JAVACMD" ] ; then
+        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+else
+    JAVACMD="java"
+    which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+fi
+
+#
+# Make sure the `java` command is executable.
+#
+if [ ! -x "$JAVACMD" ] ; then
+    die "The JAVA_HOME environment variable is not defined correctly
+This environment variable is needed to run this program
+NB: JAVA_HOME should point to a JDK not a JRE"
+fi
+
+#
+# Find the directory that this script is in.
+#
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+#
+# Set GRADLE_HOME and other Gradle-related environment variables.
+#
+if [ -z "$GRADLE_HOME" ]; then
+    GRADLE_HOME="$SCRIPT_DIR"/gradle
+fi
+export GRADLE_HOME
+
+#
+# Add `gradle/bin` to the `PATH`.
+#
+export PATH="$GRADLE_HOME"/bin:"$PATH"
+
+#
+# Set any `GRADLE_OPTS`.
+#
+if [ -z "$GRADLE_OPTS" ]; then
+    GRADLE_OPTS=""
+fi
+export GRADLE_OPTS
+
+#
+# Execute the Gradle build.
+#
+exec "$JAVACMD" $GRADLE_OPTS -classpath "$SCRIPT_DIR"/gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain "$@"
