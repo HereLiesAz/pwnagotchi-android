@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,18 +14,20 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DiscoverPluginsScreen(
-    plugins: List<CommunityPlugin>
+    plugins: List<CommunityPlugin>,
+    onInstallPlugin: (String) -> Unit
 ) {
     LazyColumn {
         items(plugins) { plugin ->
-            CommunityPluginItem(plugin = plugin)
+            CommunityPluginItem(plugin = plugin, onInstall = { onInstallPlugin(plugin.name) })
         }
     }
 }
 
 @Composable
 fun CommunityPluginItem(
-    plugin: CommunityPlugin
+    plugin: CommunityPlugin,
+    onInstall: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -36,11 +39,9 @@ fun CommunityPluginItem(
         ) {
             Text(text = plugin.name, style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
             Text(text = plugin.description, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+            Button(onClick = onInstall) {
+                Text("Install")
+            }
         }
     }
 }
-
-data class CommunityPlugin(
-    val name: String,
-    val description: String
-)

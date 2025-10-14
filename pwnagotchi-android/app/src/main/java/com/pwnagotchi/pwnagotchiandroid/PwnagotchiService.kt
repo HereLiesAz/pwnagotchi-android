@@ -1,5 +1,6 @@
 package com.pwnagotchi.pwnagotchiandroid
 
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -50,8 +51,7 @@ class PwnagotchiService : Service() {
         val ipAddress = sharedPreferences.getString("ip_address", null)
         val host = sharedPreferences.getString("host", "127.0.0.1") ?: "127.0.0.1"
         if (ipAddress != null) {
-            // TODO: Use wss for secure WebSocket connections. This will require server-side changes.
-            connect(URI("ws://$host:8765"))
+            connect(URI("wss://$host:8765"))
         }
         return START_STICKY
     }
@@ -72,6 +72,7 @@ class PwnagotchiService : Service() {
                 }
 
                 override fun onMessage(message: String?) {
+                    if (message == null) return
                     val json = JSONObject(message)
                     when (json.getString("type")) {
                         "ui_update" -> {
@@ -169,6 +170,14 @@ class PwnagotchiService : Service() {
     fun getCommunityPlugins() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"get_community_plugins\"}")
+        } else {
+            _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
+        }
+    }
+
+    fun installCommunityPlugin(pluginName: String) {
+        if (isWebSocketOpen()) {
+            webSocketClient?.send("{\"command\": \"install_community_plugin\", \"plugin_name\": \"$pluginName\"}")
         } else {
             _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
         }

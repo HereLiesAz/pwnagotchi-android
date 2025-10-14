@@ -12,29 +12,20 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
 
-// TODO: (Architectural) Refactor navigation to use Jetpack Navigation.
-// The current navigation is handled by mutable boolean states, which is not scalable.
-// Adopting the Jetpack Navigation Component will make the navigation logic more robust,
-// scalable, and easier to understand and maintain. This is a significant architectural
-// change that will be addressed in a future task.
 class MainActivity : ComponentActivity() {
-    private val viewModel: MainViewModel by viewModels()
-    private var bettercapService: BettercapService? = null
+    private val pwnagotchiViewModel: PwnagotchiViewModel by viewModels()
+    private var pwnagotchiService: PwnagotchiService? = null
     private var isServiceBound = false
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as BettercapService.LocalBinder
-            bettercapService = binder.getService()
+            val binder = service as PwnagotchiService.LocalBinder
+            pwnagotchiService = binder.getService()
             isServiceBound = true
-            viewModel.setService(bettercapService!!)
+            pwnagotchiViewModel.setService(pwnagotchiService)
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -44,26 +35,40 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val serviceIntent = Intent(this, PwnagotchiService::class.java)
+        startService(serviceIntent)
+        bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)
+
         setContent {
             PwnagotchiAndroidTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var showSetup by remember { mutableStateOf(false) }
-                    var showMain by remember { mutableStateOf(false) }
-
-                    when {
-                        showMain -> MainScreen(viewModel)
-                        showSetup -> SetupScreen(onSetupComplete = {
-                            val intent = Intent(this, BettercapService::class.java)
-                            startService(intent)
-                            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-                            showMain = true
-                        })
-                        else -> CompatibilityScreen(onNavigateToSetup = { showSetup = true })
-                    }
+                    NavGraph(
+                        mainViewModel = pwnagotchiViewModel,
+                        onTogglePlugin = { pluginName, enabled ->
+                            pwnagotchiService?.togglePlugin(pluginName, enabled)
+                        },
+                        onInstallPlugin = { pluginName ->
+                            pwnagotchiService?.installCommunityPlugin(pluginName)
+                        },
+                        onSaveSettings = { ipAddress, host ->
+                            val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+                            sharedPreferences.edit()
+                                .putString("ip_address", ipAddress)
+                                .putString("host", host)
+                                .apply()
+                            pwnagotchiService?.disconnect()
+                            pwnagotchiService?.connect(java.net.URI("wss://$host:8765"))
+                        },
+                        onReconnect = {
+                            pwnagotchiService?.disconnect()
+                            val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+                            val host = sharedPreferences.getString("host", "127.0.0.1") ?: "127.0.0.1"
+                            pwnagotchiService?.connect(java.net.URI("wss://$host:8765"))
+                        }
+                    )
                 }
             }
         }
