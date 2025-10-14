@@ -53,8 +53,7 @@ class BettercapService : Service() {
         serviceJob.cancel()
     }
 
-    override fun onCreate() {
-        super.onCreate()
+    private fun createNotification(contentText: String): Notification {
         val channelId = "bettercap_service_channel"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -65,10 +64,6 @@ class BettercapService : Service() {
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }
-    }
-
-    private fun createNotification(contentText: String): Notification {
-        val channelId = "bettercap_service_channel"
 
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle("Bettercap Service")

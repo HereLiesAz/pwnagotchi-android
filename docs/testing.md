@@ -1,6 +1,6 @@
 # Testing
 
-This document describes the testing strategy for the Pwnagotchi Android application.
+This document describes the testing strategy for the Pwnagotchi Android Super App.
 
 As the project is in its early stages, a formal testing suite has not yet been established. However, the following testing strategies are planned for the future:
 

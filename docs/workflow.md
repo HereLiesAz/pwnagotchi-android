@@ -1,6 +1,6 @@
 # Workflow
 
-This document describes the development workflow for the Pwnagotchi Android application.
+This document describes the development workflow for the Pwnagotchi Android Super App.
 
 1.  **Create a new branch:** All new features and bug fixes should be developed in a new branch.
 2.  **Write code:** Write the code for the new feature or bug fix.

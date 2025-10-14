@@ -1,25 +1,16 @@
 # Screens
 
-This document provides information about the different screens in the Pwnagotchi Android application.
+This document provides information about the different screens in the Pwnagotchi Android Super App.
 
-## Main Screen
+## Client Mode
 
-The main screen is the primary screen of the application. It displays the following information:
+*   **Main Screen:** Displays the connection status, data from the Pwnagotchi, and a list of captured handshakes.
+*   **Settings Screen:** Allows the user to configure the Pwnagotchi's IP address and the application theme.
+*   **Plugins Screen:** Displays a list of available plugins and allows the user to enable or disable them.
+*   **oPwngrid Screen:** Displays the leaderboard from the oPwngrid server.
 
-*   The connection status to the Pwnagotchi.
-*   The data received from the Pwnagotchi.
-*   A list of captured handshakes.
-*   Buttons to connect, disconnect, and request root permissions.
-*   Buttons to navigate to the Settings, Plugins, and oPwngrid screens.
+## Native Mode
 
-## Settings Screen
-
-The settings screen allows the user to configure the Pwnagotchi's IP address and the application theme.
-
-## Plugins Screen
-
-The plugins screen displays a list of available plugins and allows the user to enable or disable them.
-
-## oPwngrid Screen
-
-The oPwngrid screen displays the leaderboard from the oPwngrid server.
+*   **Compatibility Screen:** Checks for root access and a compatible WiFi chipset.
+*   **Setup Screen:** Guides the user through the process of setting up their device to run as a Pwnagotchi.
+*   **Main Screen:** Displays the live status information from the `bettercap` service.
