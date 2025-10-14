@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import com.pwnagotchi.pwnagotchiandroid.utils.NetworkUtils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,24 +46,37 @@ class BettercapService : Service() {
     private fun startBettercap() {
         serviceScope.launch {
             val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-            val unsafeInterfaceName = sharedPreferences.getString("interface_name", "wlan0") ?: "wlan0"
+            val unsafeInterfaceName = sharedPreferences.getString("interface_name", NetworkUtils.getWifiInterfaceName()) ?: NetworkUtils.getWifiInterfaceName()
             val interfaceName = unsafeInterfaceName.filter { it.isLetterOrDigit() }
 
             val outputBuffer = mutableListOf<String>()
             _uiState.value = "" // Start with empty output
+
+            val stdHandler = { element: String ->
+                outputBuffer.add(element)
+                if (outputBuffer.size > 100) {
+                    outputBuffer.removeAt(0)
+                }
+                _uiState.value = outputBuffer.joinToString("\n")
+                updateWidget(outputBuffer.joinToString("\n"))
+            }
+
             val streamOutput = object : MutableList<String> by mutableListOf() {
                 override fun add(element: String): Boolean {
-                    outputBuffer.add(element)
-                    if (outputBuffer.size > 100) {
-                        outputBuffer.removeAt(0)
-                    }
-                    _uiState.value = outputBuffer.joinToString("\n")
-                    updateWidget(outputBuffer.joinToString("\n"))
+                    stdHandler(element)
                     return true
                 }
             }
+
+            val errorStreamOutput = object : MutableList<String> by mutableListOf() {
+                override fun add(element: String): Boolean {
+                    stdHandler("[ERROR] $element")
+                    return true
+                }
+            }
+
             Shell.cmd("bettercap -iface $interfaceName -caplet pwnagotchi-auto")
-                .to(streamOutput, streamOutput)
+                .to(streamOutput, errorStreamOutput)
                 .submit()
         }
     }
