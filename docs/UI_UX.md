@@ -1,6 +1,6 @@
 # UI/UX Design
 
-This document outlines the UI/UX design principles and guidelines for the Pwnagotchi Android application.
+This document outlines the UI/UX design principles and guidelines for the Pwnagotchi Android Super App.
 
 ## Principles
 
@@ -9,20 +9,14 @@ This document outlines the UI/UX design principles and guidelines for the Pwnago
 *   **Readability:** The UI should be easy to read and understand.
 *   **Accessibility:** The UI should be accessible to all users.
 
-## Colors
+## Modes
 
-The application uses the Material Design color system. The primary and secondary colors are defined in the `Theme.kt` file.
+The app will have two distinct modes, and the UI will adapt to each mode.
 
-## Typography
+### Client Mode
 
-The application uses the Material Design type system. The default font is Roboto.
+In Client Mode, the UI will focus on displaying data from the external Pwnagotchi device. It will provide a clear and concise overview of the device's status and activity.
 
-## Themes
+### Native Mode
 
-The application supports the following themes:
-
-*   **System:** Follows the system theme (light or dark).
-*   **Light:** A light theme.
-*   **Dark:** A dark theme.
-
-The theme can be changed in the settings screen.
+In Native Mode, the UI will provide a more immersive experience, as the Android device itself is the Pwnagotchi. The UI will display the Pwnagotchi's "face" and other status information, similar to the original e-ink display.

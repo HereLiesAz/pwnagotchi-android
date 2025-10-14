@@ -44,20 +44,13 @@ fun PwnagotchiAndroidTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("pwnagotchi_prefs", android.content.Context.MODE_PRIVATE)
-    val theme = sharedPreferences.getString("theme", "System") ?: "System"
-    val useDarkTheme = when (theme) {
-        "Light" -> false
-        "Dark" -> true
-        else -> isSystemInDarkTheme()
-    }
-
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (useDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        useDarkTheme -> DarkColorScheme
+
+        darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current
@@ -65,7 +58,7 @@ fun PwnagotchiAndroidTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = useDarkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }
 

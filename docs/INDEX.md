@@ -1,6 +1,6 @@
-# Pwnagotchi Android App Documentation
+# Pwnagotchi Super App Documentation
 
-Welcome to the documentation for the Pwnagotchi Android application. This documentation provides a comprehensive overview of the project, from its architecture and design to the development workflow.
+Welcome to the documentation for the Pwnagotchi Android Super App. This documentation provides a comprehensive overview of the project, from its architecture and design to the development workflow.
 
 ## Table of Contents
 
@@ -16,13 +16,3 @@ Welcome to the documentation for the Pwnagotchi Android application. This docume
 *   [task_flow.md](./task_flow.md): Information about the task flow of the application.
 *   [testing.md](./testing.md): Information about the testing strategy for the application.
 *   [workflow.md](./workflow.md): Information about the development workflow.
-
-## Future Features
-
-The `TODO.md` file contains a list of planned features for the application, including:
-
-*   A Pwnagotchi Character Engine
-*   Pwnserver/oPwngrid Integration
-*   Automatic Remote Instance Setup
-*   A Plugin Community Store
-*   Android Home Screen and Wearable Widgets

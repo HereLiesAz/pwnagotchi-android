@@ -1,6 +1,6 @@
 # Miscellaneous
 
-This document contains miscellaneous information about the Pwnagotchi Android application.
+This document contains miscellaneous information about the Pwnagotchi Android Super App.
 
 ## Libraries
 
@@ -8,3 +8,4 @@ This document contains miscellaneous information about the Pwnagotchi Android ap
 *   **Kotlin Coroutines:** A library for managing background threads.
 *   **Java-WebSocket:** A lightweight and easy-to-use WebSocket client.
 *   **libsu:** A library for accessing root permissions on Android.
+*   **Ktor:** A framework for building asynchronous clients and servers.
