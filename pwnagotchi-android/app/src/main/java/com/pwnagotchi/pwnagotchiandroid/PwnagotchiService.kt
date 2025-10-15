@@ -42,7 +42,6 @@ class PwnagotchiService : Service() {
     private lateinit var connectivityManager: ConnectivityManager
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private var isNetworkAvailable = false
-    private var needsReconnect = false
     private val opwngridClient = OpwngridClient()
 
     inner class LocalBinder : Binder() {
@@ -67,9 +66,8 @@ class PwnagotchiService : Service() {
         val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", getString(R.string.notification_service_running))
         startForeground(1, notification)
         val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-        val ipAddress = sharedPreferences.getString("ip_address", null)
-        val host = sharedPreferences.getString("host", "127.0.0.1") ?: "127.0.0.1"
-        if (ipAddress != null) {
+        val host = sharedPreferences.getString("host", null)
+        if (host != null) {
             connect(URI("wss://$host:8765"))
         }
         return START_STICKY
@@ -77,7 +75,6 @@ class PwnagotchiService : Service() {
 
     fun connect(uri: URI) {
         currentUri = uri
-        needsReconnect = true
         reconnectionJob?.cancel() // Cancel any previous reconnection attempts
         webSocketClient?.close() // Close any existing connection
 
@@ -138,7 +135,6 @@ class PwnagotchiService : Service() {
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
                     _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_connection_closed))
                     updateNotification(getString(R.string.status_connection_closed))
-                    needsReconnect = true
                     if (isNetworkAvailable) {
                         scheduleReconnect()
                     }
@@ -146,7 +142,6 @@ class PwnagotchiService : Service() {
 
                 override fun onError(ex: Exception?) {
                     _uiState.value = PwnagotchiUiState.Error(ex?.message ?: getString(R.string.error_unknown))
-                    needsReconnect = true
                     if (isNetworkAvailable) {
                         scheduleReconnect()
                     }
@@ -155,7 +150,6 @@ class PwnagotchiService : Service() {
             webSocketClient?.connect()
         } catch (e: Exception) {
             _uiState.value = PwnagotchiUiState.Error(e.message ?: getString(R.string.error_unknown_connection))
-            needsReconnect = true
             if (isNetworkAvailable) {
                 scheduleReconnect()
             }
@@ -163,7 +157,7 @@ class PwnagotchiService : Service() {
     }
 
     fun disconnect() {
-        needsReconnect = false
+        currentUri = null
         reconnectionJob?.cancel()
         webSocketClient?.close()
         _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_disconnected_by_user))
@@ -246,9 +240,7 @@ class PwnagotchiService : Service() {
         return object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 isNetworkAvailable = true
-                if (needsReconnect) {
-                    scheduleReconnect()
-                }
+                scheduleReconnect()
             }
 
             override fun onLost(network: Network) {

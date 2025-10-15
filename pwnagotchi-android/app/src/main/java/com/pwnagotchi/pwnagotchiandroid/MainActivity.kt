@@ -54,10 +54,9 @@ class MainActivity : ComponentActivity() {
                         onInstallPlugin = { pluginName ->
                             pwnagotchiService?.installCommunityPlugin(pluginName)
                         },
-                        onSaveSettings = { ipAddress, host ->
+                        onSaveSettings = { host ->
                             val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
                             sharedPreferences.edit()
-                                .putString("ip_address", ipAddress)
                                 .putString("host", host)
                                 .apply()
                             pwnagotchiService?.disconnect()

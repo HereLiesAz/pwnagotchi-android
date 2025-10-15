@@ -14,13 +14,13 @@ fun NavGraph(
     mainViewModel: PwnagotchiViewModel,
     onTogglePlugin: (String, Boolean) -> Unit,
     onInstallPlugin: (String) -> Unit,
-    onSaveSettings: (String, String) -> Unit,
+    onSaveSettings: (String) -> Unit,
     onReconnect: () -> Unit
 ) {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-    val ipAddress = sharedPreferences.getString("ip_address", null)
-    val startDestination = if (ipAddress == null) Screen.Settings.route else Screen.Home.route
+    val host = sharedPreferences.getString("host", null)
+    val startDestination = if (host == null) Screen.Settings.route else Screen.Home.route
 
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
