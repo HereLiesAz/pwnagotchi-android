@@ -14,7 +14,8 @@ import androidx.compose.ui.res.stringResource
 fun PwnagotchiScreen(
     viewModel: PwnagotchiViewModel,
     onNavigateToSettings: () -> Unit,
-    onNavigateToPlugins: () -> Unit
+    onNavigateToPlugins: () -> Unit,
+    onNavigateToOpwngrid: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     Column {
@@ -35,6 +36,9 @@ fun PwnagotchiScreen(
         }
         Button(onClick = onNavigateToSettings) {
             Text(stringResource(id = R.string.settings))
+        }
+        Button(onClick = onNavigateToOpwngrid) {
+            Text(stringResource(id = R.string.opwngrid))
         }
         Button(onClick = onNavigateToPlugins) {
             Text(stringResource(id = R.string.plugins))

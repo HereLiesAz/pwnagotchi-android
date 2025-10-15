@@ -39,7 +39,7 @@ With a stable build environment, this phase focuses on improving code quality, e
 
 - [x] **Step 3.2.3: Refactor State Management to a Single Source of Truth**
     - [x] In `PwnagotchiViewModel.kt`, remove logic that directly modifies UI state from `fetchLeaderboard`. The ViewModel should only delegate calls to the service. *(Note: This issue was already resolved in the codebase.)*
-    - [ ] In `PwnagotchiService.kt`, create a new `fetchLeaderboard` function that performs the network call and updates the service's internal state, which will then emit an updated `uiState`.
+    - [x] In `PwnagotchiService.kt`, create a new `fetchLeaderboard` function that performs the network call and updates the service's internal state, which will then emit an updated `uiState`.
 
 - [x] **Step 3.2.4: Implement Robust Reconnection Logic**
     - [x] Refactor `scheduleReconnect` in `PwnagotchiService.kt` to be network-aware.
@@ -84,10 +84,10 @@ The final phase involves preparing the application for a public release.
 - [x] **Step 3.4.2: Configure ProGuard/R8 Rules**
     - [x] Add necessary `-keep` rules to `proguard-rules.pro` to prevent R8 from removing classes used via reflection by `kotlinx.serialization`.
 
-- [ ] **Step 3.4.3: Final API Endpoint Verification**
-    - [ ] Investigate and verify a stable, public API endpoint for oPwngrid leaderboard data.
-    - [ ] If no reliable endpoint is found, disable or remove the feature from the UI.
+- [x] **Step 3.4.3: Final API Endpoint Verification**
+    - [x] Investigate and verify a stable, public API endpoint for oPwngrid leaderboard data.
+    - [x] If no reliable endpoint is found, disable or remove the feature from the UI.
 
-- [ ] **Step 3.4.4: Remove All Logging and TODOs**
-    - [ ] Conduct a project-wide search to remove all debug logging (`Log.d`, `e.printStackTrace()`).
-    - [ ] Resolve or remove all remaining `// TODO` comments.
+- [x] **Step 3.4.4: Remove All Logging and TODOs**
+    - [x] Conduct a project-wide search to remove all debug logging (`Log.d`, `e.printStackTrace()`).
+    - [x] Resolve or remove all remaining `// TODO` comments.

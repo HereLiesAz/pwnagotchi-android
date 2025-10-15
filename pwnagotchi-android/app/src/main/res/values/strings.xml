@@ -33,4 +33,5 @@
     <string name="notification_network_lost">Network lost</string>
     <string name="notification_service_running">Pwnagotchi service is running</string>
     <string name="notification_handshake_captured">Captured handshake from %1$s</string>
+    <string name="opwngrid">oPwngrid</string>
 </resources>

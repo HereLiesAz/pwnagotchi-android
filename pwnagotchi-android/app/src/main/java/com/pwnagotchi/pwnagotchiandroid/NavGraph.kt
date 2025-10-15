@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.Text
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -33,7 +34,8 @@ fun NavGraph(
                     PwnagotchiScreen(
                         viewModel = mainViewModel,
                         onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
-                        onNavigateToPlugins = { navController.navigate(Screen.Plugins.route) }
+                        onNavigateToPlugins = { navController.navigate(Screen.Plugins.route) },
+                        onNavigateToOpwngrid = { navController.navigate(Screen.Opwngrid.route) }
                     )
                 }
                 is PwnagotchiUiState.Disconnected -> {
@@ -61,6 +63,9 @@ fun NavGraph(
                     onBack = { navController.popBackStack() }
                 )
             }
+        }
+        composable(Screen.Opwngrid.route) {
+            OpwngridScreen()
         }
     }
 }

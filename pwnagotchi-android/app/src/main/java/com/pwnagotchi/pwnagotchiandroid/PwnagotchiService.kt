@@ -43,6 +43,7 @@ class PwnagotchiService : Service() {
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private var isNetworkAvailable = false
     private var needsReconnect = false
+    private val opwngridClient = OpwngridClient()
 
     inner class LocalBinder : Binder() {
         fun getService(): PwnagotchiService = this@PwnagotchiService
@@ -167,6 +168,16 @@ class PwnagotchiService : Service() {
         webSocketClient?.close()
         _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_disconnected_by_user))
         updateNotification(getString(R.string.status_disconnected_by_user))
+    }
+
+    fun fetchLeaderboard() {
+        serviceScope.launch {
+            val leaderboard = opwngridClient.getLeaderboard()
+            val currentState = _uiState.value
+            if (currentState is PwnagotchiUiState.Connected) {
+                _uiState.value = currentState.copy(leaderboard = leaderboard)
+            }
+        }
     }
 
     private fun isWebSocketOpen(): Boolean {
