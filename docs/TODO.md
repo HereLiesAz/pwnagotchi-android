@@ -78,11 +78,11 @@ This phase addresses major architectural and user interface flaws, focusing on n
 
 The final phase involves preparing the application for a public release.
 
-- [ ] **Step 3.4.1: Enable Code Shrinking and Obfuscation**
-    - [ ] In `app/build.gradle.kts`, set `isMinifyEnabled` to `true` for the `release` build type.
+- [x] **Step 3.4.1: Enable Code Shrinking and Obfuscation**
+    - [x] In `app/build.gradle.kts`, set `isMinifyEnabled` to `true` for the `release` build type.
 
-- [ ] **Step 3.4.2: Configure ProGuard/R8 Rules**
-    - [ ] Add necessary `-keep` rules to `proguard-rules.pro` to prevent R8 from removing classes used via reflection by `kotlinx.serialization`.
+- [x] **Step 3.4.2: Configure ProGuard/R8 Rules**
+    - [x] Add necessary `-keep` rules to `proguard-rules.pro` to prevent R8 from removing classes used via reflection by `kotlinx.serialization`.
 
 - [ ] **Step 3.4.3: Final API Endpoint Verification**
     - [ ] Investigate and verify a stable, public API endpoint for oPwngrid leaderboard data.
