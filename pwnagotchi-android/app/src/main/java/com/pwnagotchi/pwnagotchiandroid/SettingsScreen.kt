@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.pwnagotchi.pwnagotchiandroid.core.Constants
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
@@ -36,10 +37,10 @@ fun SettingsScreen(
         context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
     }
     var ipAddress by remember {
-        mutableStateOf(sharedPreferences.getString("ip_address", "127.0.0.1") ?: "127.0.0.1")
+        mutableStateOf(sharedPreferences.getString("ip_address", Constants.DEFAULT_PWNAGOTCHI_IP) ?: Constants.DEFAULT_PWNAGOTCHI_IP)
     }
     var host by remember {
-        mutableStateOf(sharedPreferences.getString("host", "127.0.0.1") ?: "127.0.0.1")
+        mutableStateOf(sharedPreferences.getString("host", Constants.DEFAULT_PWNAGOTCHI_IP) ?: Constants.DEFAULT_PWNAGOTCHI_IP)
     }
     var theme by remember {
         mutableStateOf(sharedPreferences.getString("theme", "System") ?: "System")

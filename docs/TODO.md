@@ -6,39 +6,39 @@ This document outlines a comprehensive, multi-phase roadmap to transform the Pwn
 
 This initial phase focuses on stabilizing the project's foundation by updating its build environment and dependencies. This is a prerequisite for all subsequent work.
 
-- [ ] **Step 3.1.1: Update Gradle and Android Gradle Plugin (AGP)**
-    - [ ] Modify `gradle/wrapper/gradle-wrapper.properties` to use a modern, stable Gradle version (e.g., 8.13).
-    - [ ] Ensure the root `build.gradle.kts` specifies a compatible, stable AGP version (e.g., 8.13.0).
+- [x] **Step 3.1.1: Update Gradle and Android Gradle Plugin (AGP)**
+    - [x] Modify `gradle/wrapper/gradle-wrapper.properties` to use a modern, stable Gradle version (e.g., 8.13).
+    - [x] Ensure the root `build.gradle.kts` specifies a compatible, stable AGP version (e.g., 8.13.0).
 
-- [ ] **Step 3.1.2: Correct SDK and Tooling Versions**
-    - [ ] In `app/build.gradle.kts`, change `compileSdk` and `targetSdk` from preview version 36 to the latest stable version (e.g., 35).
-    - [ ] Remove the explicit `buildToolsVersion` definition from `app/build.gradle.kts`.
+- [x] **Step 3.1.2: Correct SDK and Tooling Versions**
+    - [x] In `app/build.gradle.kts`, change `compileSdk` and `targetSdk` from preview version 36 to the latest stable version (e.g., 35).
+    - [x] Remove the explicit `buildToolsVersion` definition from `app/build.gradle.kts`.
 
-- [ ] **Step 3.1.3: Overhaul Project Dependencies**
-    - [ ] Replace the outdated Compose BOM `2023.03.00` with the latest stable version (e.g., `2025.10.00`).
-    - [ ] Remove explicit versions from all `androidx.compose` dependencies to let the BOM manage them.
-    - [ ] Update all other outdated dependencies (AndroidX, Ktor, Java-WebSocket) to their latest stable versions as detailed in the audit.
-    - [ ] Remove the legacy Material 2 dependency: `com.google.android.material:material`.
+- [x] **Step 3.1.3: Overhaul Project Dependencies**
+    - [x] Replace the outdated Compose BOM `2023.03.00` with the latest stable version (e.g., `2025.10.00`).
+    - [x] Remove explicit versions from all `androidx.compose` dependencies to let the BOM manage them.
+    - [x] Update all other outdated dependencies (AndroidX, Ktor, Java-WebSocket) to their latest stable versions as detailed in the audit.
+    - [x] Remove the legacy Material 2 dependency: `com.google.android.material:material`.
 
-- [ ] **Step 3.1.4: Sync and Resolve Breaking Changes**
-    - [ ] Perform a Gradle sync.
-    - [ ] Systematically compile and address all breaking API changes resulting from the dependency upgrades, paying close attention to Ktor (2.x to 3.x) and Jetpack libraries.
+- [x] **Step 3.1.4: Sync and Resolve Breaking Changes**
+    - [x] Perform a Gradle sync.
+    - [x] Systematically compile and address all breaking API changes resulting from the dependency upgrades, paying close attention to Ktor (2.x to 3.x) and Jetpack libraries.
 
 ## Phase 2: Codebase Refactoring & Modernization
 
 With a stable build environment, this phase focuses on improving code quality, eliminating anti-patterns, and increasing the application's robustness.
 
-- [ ] **Step 3.2.1: Centralize Constants**
-    - [ ] Create a new `Constants.kt` file for application-wide constants.
-    - [ ] Move hardcoded values (IP addresses, ports, API URLs) into this file.
-    - [ ] Refactor the codebase to reference these constants.
+- [x] **Step 3.2.1: Centralize Constants**
+    - [x] Create a new `Constants.kt` file for application-wide constants.
+    - [x] Move hardcoded values (IP addresses, ports, API URLs) into this file.
+    - [x] Refactor the codebase to reference these constants.
 
-- [ ] **Step 3.2.2: Implement Type-Safe Serialization**
-    - [ ] Define `@Serializable` data classes for all WebSocket message structures.
-    - [ ] Refactor `PwnagotchiService.kt`'s `onMessage` callback to use `kotlinx.serialization` for JSON parsing, removing all `org.json.JSONObject` usage.
+- [x] **Step 3.2.2: Implement Type-Safe Serialization**
+    - [x] Define `@Serializable` data classes for all WebSocket message structures.
+    - [x] Refactor `PwnagotchiService.kt`'s `onMessage` callback to use `kotlinx.serialization` for JSON parsing, removing all `org.json.JSONObject` usage.
 
-- [ ] **Step 3.2.3: Refactor State Management to a Single Source of Truth**
-    - [ ] In `PwnagotchiViewModel.kt`, remove logic that directly modifies UI state from `fetchLeaderboard`. The ViewModel should only delegate calls to the service.
+- [x] **Step 3.2.3: Refactor State Management to a Single Source of Truth**
+    - [x] In `PwnagotchiViewModel.kt`, remove logic that directly modifies UI state from `fetchLeaderboard`. The ViewModel should only delegate calls to the service. *(Note: This issue was already resolved in the codebase.)*
     - [ ] In `PwnagotchiService.kt`, create a new `fetchLeaderboard` function that performs the network call and updates the service's internal state, which will then emit an updated `uiState`.
 
 - [ ] **Step 3.2.4: Implement Robust Reconnection Logic**
