@@ -36,3 +36,12 @@ pwnagotchi-android/.gradle
 # SSL certificate
 key.pem
 cert.pem
+
+# Android
+pwnagotchi-android/app/local.properties
+pwnagotchi-android/.gradle
+*.hprof
+
+# SSL certificate
+key.pem
+cert.pem
