@@ -2,6 +2,8 @@ import logging
 import asyncio
 import websockets
 import json
+import ssl
+import pathlib
 import pwnagotchi.plugins as plugins
 import threading
 
@@ -49,7 +51,13 @@ class WSServer(plugins.Plugin):
         asyncio.set_event_loop(self.loop)
         host = self.options.get('host', '127.0.0.1')
         port = self.options.get('port', 8765)
-        self.server = websockets.serve(self._server_handler, host, port)
+
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        cert_pem = pathlib.Path(__file__).with_name("cert.pem")
+        key_pem = pathlib.Path(__file__).with_name("key.pem")
+        ssl_context.load_cert_chain(cert_pem, key_pem)
+
+        self.server = websockets.serve(self._server_handler, host, port, ssl=ssl_context)
         self.loop.run_until_complete(self.server)
         self.loop.run_forever()
 

@@ -82,6 +82,7 @@ fun SettingsScreen(
                 .putString("theme", theme)
                 .apply()
             onSave(ipAddress, host)
+            onBack()
         }) {
             Text(stringResource(id = R.string.save))
         }

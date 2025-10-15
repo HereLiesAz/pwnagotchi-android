@@ -53,7 +53,7 @@ fun PluginsScreen(
             }
             when (selectedTab) {
                 0 -> InstalledPluginsScreen(plugins = installedPlugins, onTogglePlugin = onTogglePlugin)
-                1 -> DiscoverPluginsScreen(plugins = communityPlugins)
+                1 -> DiscoverPluginsScreen(plugins = communityPlugins, onInstallPlugin = { /*TODO*/ })
             }
         }
     }

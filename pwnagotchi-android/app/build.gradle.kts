@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.pwnagotchi.pwnagotchiandroid"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.pwnagotchi.pwnagotchiandroid"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -59,8 +59,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("com.github.topjohnwu.libsu:core:5.2.2")
-    implementation("com.github.topjohnwu.libsu:service:5.2.2")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("org.java-websocket:Java-WebSocket:1.5.6")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

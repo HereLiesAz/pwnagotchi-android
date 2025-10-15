@@ -39,8 +39,3 @@ fun CommunityPluginItem(
         }
     }
 }
-
-data class CommunityPlugin(
-    val name: String,
-    val description: String
-)
