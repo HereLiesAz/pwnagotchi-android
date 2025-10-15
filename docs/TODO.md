@@ -53,10 +53,10 @@ With a stable build environment, this phase focuses on improving code quality, e
 
 This phase addresses major architectural and user interface flaws, focusing on navigation, theming, and resource correctness.
 
-- [ ] **Step 3.3.1: Implement Jetpack Navigation Compose**
-    - [ ] Add the `androidx.navigation:navigation-compose` dependency.
-    - [ ] Create a sealed class to define navigation routes.
-    - [ ] Replace the boolean-flag-based navigation in `MainActivity.kt` with a `NavHost` and composable destinations for a proper back stack.
+- [x] **Step 3.3.1: Implement Jetpack Navigation Compose**
+    - [x] Add the `androidx.navigation:navigation-compose` dependency.
+    - [x] Create a sealed class to define navigation routes.
+    - [x] Replace the boolean-flag-based navigation in `MainActivity.kt` with a `NavHost` and composable destinations for a proper back stack.
 
 - [ ] **Step 3.3.2: Unify Theming to Material 3**
     - [ ] Delete legacy M2 theme and color files (`themes.xml`, `colors.xml`).

@@ -12,17 +12,18 @@ import androidx.navigation.compose.rememberNavController
 fun NavGraph(
     mainViewModel: PwnagotchiViewModel,
     onTogglePlugin: (String, Boolean) -> Unit,
+    onInstallPlugin: (String) -> Unit,
     onSaveSettings: (String, String) -> Unit,
     onReconnect: () -> Unit
 ) {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
     val ipAddress = sharedPreferences.getString("ip_address", null)
-    val startDestination = if (ipAddress == null) "settings" else "main"
+    val startDestination = if (ipAddress == null) Screen.Settings.route else Screen.Home.route
 
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
-        composable("main") {
+        composable(Screen.Home.route) {
             val uiState = mainViewModel.uiState.collectAsState().value
             when (uiState) {
                 is PwnagotchiUiState.Connecting -> {
@@ -31,8 +32,8 @@ fun NavGraph(
                 is PwnagotchiUiState.Connected -> {
                     PwnagotchiScreen(
                         viewModel = mainViewModel,
-                        onNavigateToSettings = { navController.navigate("settings") },
-                        onNavigateToPlugins = { navController.navigate("plugins") }
+                        onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                        onNavigateToPlugins = { navController.navigate(Screen.Plugins.route) }
                     )
                 }
                 is PwnagotchiUiState.Disconnected -> {
@@ -43,19 +44,20 @@ fun NavGraph(
                 }
             }
         }
-        composable("settings") {
+        composable(Screen.Settings.route) {
             SettingsScreen(
                 onSave = onSaveSettings,
                 onBack = { navController.popBackStack() }
             )
         }
-        composable("plugins") {
+        composable(Screen.Plugins.route) {
             val uiState = mainViewModel.uiState.collectAsState().value
             if (uiState is PwnagotchiUiState.Connected) {
                 PluginsScreen(
                     installedPlugins = uiState.plugins,
                     communityPlugins = uiState.communityPlugins,
                     onTogglePlugin = onTogglePlugin,
+                    onInstallPlugin = onInstallPlugin,
                     onBack = { navController.popBackStack() }
                 )
             }
