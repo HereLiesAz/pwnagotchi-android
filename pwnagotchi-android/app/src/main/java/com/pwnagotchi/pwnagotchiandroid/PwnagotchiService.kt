@@ -4,6 +4,10 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Binder
 import android.os.IBinder
 import kotlinx.coroutines.CoroutineScope
@@ -36,9 +40,23 @@ class PwnagotchiService : Service() {
     private val communityPlugins = mutableListOf<CommunityPlugin>()
     private var face = "(·•᷄_•᷅ ·)"
     private val json = Json { ignoreUnknownKeys = true }
+    private lateinit var connectivityManager: ConnectivityManager
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
+    private var isNetworkAvailable = false
+    private var needsReconnect = false
 
     inner class LocalBinder : Binder() {
         fun getService(): PwnagotchiService = this@PwnagotchiService
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        networkCallback = createNetworkCallback()
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -59,6 +77,7 @@ class PwnagotchiService : Service() {
 
     fun connect(uri: URI) {
         currentUri = uri
+        needsReconnect = true
         reconnectionJob?.cancel() // Cancel any previous reconnection attempts
         webSocketClient?.close() // Close any existing connection
 
@@ -117,24 +136,34 @@ class PwnagotchiService : Service() {
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                    _uiState.value = PwnagotchiUiState.Disconnected("Connection closed. Reconnecting...")
-                    updateNotification("Connection closed. Reconnecting...")
-                    scheduleReconnect()
+                    _uiState.value = PwnagotchiUiState.Disconnected("Connection closed.")
+                    updateNotification("Connection closed.")
+                    needsReconnect = true
+                    if (isNetworkAvailable) {
+                        scheduleReconnect()
+                    }
                 }
 
                 override fun onError(ex: Exception?) {
                     _uiState.value = PwnagotchiUiState.Error(ex?.message ?: "Unknown error")
-                    scheduleReconnect()
+                    needsReconnect = true
+                    if (isNetworkAvailable) {
+                        scheduleReconnect()
+                    }
                 }
             }
             webSocketClient?.connect()
         } catch (e: Exception) {
             _uiState.value = PwnagotchiUiState.Error(e.message ?: "Unknown connection error")
-            scheduleReconnect()
+            needsReconnect = true
+            if (isNetworkAvailable) {
+                scheduleReconnect()
+            }
         }
     }
 
     fun disconnect() {
+        needsReconnect = false
         reconnectionJob?.cancel()
         webSocketClient?.close()
         _uiState.value = PwnagotchiUiState.Disconnected("Disconnected by user")
@@ -200,6 +229,25 @@ class PwnagotchiService : Service() {
         super.onDestroy()
         serviceScope.cancel()
         webSocketClient?.close()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
+
+    private fun createNetworkCallback(): ConnectivityManager.NetworkCallback {
+        return object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                isNetworkAvailable = true
+                if (needsReconnect) {
+                    scheduleReconnect()
+                }
+            }
+
+            override fun onLost(network: Network) {
+                isNetworkAvailable = false
+                reconnectionJob?.cancel()
+                _uiState.value = PwnagotchiUiState.Disconnected("Network lost. Awaiting connection...")
+                updateNotification("Network lost")
+            }
+        }
     }
 
     private fun updateNotification(contentText: String) {

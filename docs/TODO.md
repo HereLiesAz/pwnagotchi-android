@@ -41,9 +41,9 @@ With a stable build environment, this phase focuses on improving code quality, e
     - [x] In `PwnagotchiViewModel.kt`, remove logic that directly modifies UI state from `fetchLeaderboard`. The ViewModel should only delegate calls to the service. *(Note: This issue was already resolved in the codebase.)*
     - [ ] In `PwnagotchiService.kt`, create a new `fetchLeaderboard` function that performs the network call and updates the service's internal state, which will then emit an updated `uiState`.
 
-- [ ] **Step 3.2.4: Implement Robust Reconnection Logic**
-    - [ ] Refactor `scheduleReconnect` in `PwnagotchiService.kt` to be network-aware.
-    - [ ] Use `ConnectivityManager` to listen for network availability and only attempt reconnection when a valid network is present.
+- [x] **Step 3.2.4: Implement Robust Reconnection Logic**
+    - [x] Refactor `scheduleReconnect` in `PwnagotchiService.kt` to be network-aware.
+    - [x] Use `ConnectivityManager` to listen for network availability and only attempt reconnection when a valid network is present.
 
 - [ ] **Step 3.2.5: Externalize All UI Strings**
     - [ ] Move all hardcoded user-facing strings from Composables into `app/src/main/res/values/strings.xml`.
