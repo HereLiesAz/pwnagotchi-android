@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.pwnagotchi.pwnagotchiandroid.core.Constants
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
 
 class MainActivity : ComponentActivity() {
@@ -60,13 +61,13 @@ class MainActivity : ComponentActivity() {
                                 .putString("host", host)
                                 .apply()
                             pwnagotchiService?.disconnect()
-                            pwnagotchiService?.connect(java.net.URI("wss://$host:8765"))
+                            pwnagotchiService?.connect(java.net.URI("wss://$host:${Constants.WEBSOCKET_PORT}"))
                         },
                         onReconnect = {
                             pwnagotchiService?.disconnect()
                             val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
                             val host = sharedPreferences.getString("host", "127.0.0.1") ?: "127.0.0.1"
-                            pwnagotchiService?.connect(java.net.URI("wss://$host:8765"))
+                            pwnagotchiService?.connect(java.net.URI("wss://$host:${Constants.WEBSOCKET_PORT}"))
                         }
                     )
                 }
