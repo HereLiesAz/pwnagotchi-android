@@ -96,14 +96,14 @@ The final phase involves preparing the application for a public release.
 
 ### I. Foundational Upgrade: Aligning the Build Environment
 
-- [ ] **Step 5.1.1: Gradle Wrapper Upgrade to Version 8.14**
-    - [ ] Modify `gradle/wrapper/gradle-wrapper.properties` to set `distributionUrl` to `https\://services.gradle.org/distributions/gradle-8.14-bin.zip`.
-- [ ] **Step 5.1.2: Android Gradle Plugin and Kotlin Plugin Update**
-    - [ ] In the root `build.gradle.kts`, update the `com.android.application` plugin to version `8.14.0`.
-- [ ] **Step 5.1.3: Dependency Modernization and Addition**
-    - [ ] In `app/build.gradle.kts`, update core, Compose, Material, Ktor, and testing dependencies to the specified new versions.
-    - [ ] Add new dependencies for Jetpack Glance (`androidx.glance:glance-appwidget:1.1.1`, `androidx.glance:glance-material3:1.1.1`).
-    - [ ] Add new dependency for Jetpack Navigation Compose (`androidx.navigation:navigation-compose:2.8.0-beta05`).
+- [x] **Step 5.1.1: Gradle Wrapper Upgrade to Version 8.14**
+    - [x] Modify `gradle/wrapper/gradle-wrapper.properties` to set `distributionUrl` to `https\://services.gradle.org/distributions/gradle-8.14-bin.zip`.
+- [x] **Step 5.1.2: Android Gradle Plugin and Kotlin Plugin Update**
+    - [x] In the root `build.gradle.kts`, update the `com.android.application` plugin to version `8.14.0`.
+- [x] **Step 5.1.3: Dependency Modernization and Addition**
+    - [x] In `app/build.gradle.kts`, update core, Compose, Material, Ktor, and testing dependencies to the specified new versions.
+    - [x] Add new dependencies for Jetpack Glance (`androidx.glance:glance-appwidget:1.1.1`, `androidx.glance:glance-material3:1.1.1`).
+    - [x] Add new dependency for Jetpack Navigation Compose (`androidx.navigation:navigation-compose:2.8.0-beta05`).
 
 ### II. Architectural Refactoring: Implementing a Scalable Navigation Rail
 
