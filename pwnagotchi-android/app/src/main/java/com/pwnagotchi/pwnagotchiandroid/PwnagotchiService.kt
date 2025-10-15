@@ -4,6 +4,10 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Binder
 import android.os.IBinder
 import kotlinx.coroutines.CoroutineScope
@@ -14,9 +18,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
-import org.json.JSONObject
 import java.net.URI
 
 // TODO: Acknowledge the suggestion to split this large PR into smaller, focused PRs in the future.
@@ -35,9 +39,24 @@ class PwnagotchiService : Service() {
     private val plugins = mutableListOf<Plugin>()
     private val communityPlugins = mutableListOf<CommunityPlugin>()
     private var face = "(·•᷄_•᷅ ·)"
+    private val json = Json { ignoreUnknownKeys = true }
+    private lateinit var connectivityManager: ConnectivityManager
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
+    private var isNetworkAvailable = false
+    private var needsReconnect = false
 
     inner class LocalBinder : Binder() {
         fun getService(): PwnagotchiService = this@PwnagotchiService
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        networkCallback = createNetworkCallback()
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -58,6 +77,7 @@ class PwnagotchiService : Service() {
 
     fun connect(uri: URI) {
         currentUri = uri
+        needsReconnect = true
         reconnectionJob?.cancel() // Cancel any previous reconnection attempts
         webSocketClient?.close() // Close any existing connection
 
@@ -72,75 +92,78 @@ class PwnagotchiService : Service() {
                 }
 
                 override fun onMessage(message: String?) {
-                    if (message == null) return
-                    val json = JSONObject(message)
-                    when (json.getString("type")) {
-                        "ui_update" -> {
-                            val data = json.getJSONObject("data")
-                            face = data.getString("face")
-                            val notificationText = "CH: ${data.getString("channel")} | APS: ${data.getString("aps")} | UP: ${data.getString("uptime")} | PWND: ${data.getString("shakes")} | MODE: ${data.getString("mode")}"
-                            _uiState.value = PwnagotchiUiState.Connected(notificationText, handshakes, plugins, face, emptyList(), communityPlugins)
-                            updateNotification(notificationText)
-                        }
-                        "handshake" -> {
-                            val data = json.getJSONObject("data")
-                            val handshake = Handshake(
-                                ap = data.getJSONObject("ap").getString("hostname"),
-                                sta = data.getJSONObject("sta").getString("mac"),
-                                filename = data.getString("filename")
-                            )
-                            handshakes.add(handshake)
-                            _uiState.value = PwnagotchiUiState.Connected("New handshake captured!", handshakes, plugins, face, emptyList(), communityPlugins)
-                            showHandshakeNotification(handshake)
-                        }
-                        "plugin_list" -> {
-                            val data = json.getJSONArray("data")
-                            plugins.clear()
-                            for (i in 0 until data.length()) {
-                                val pluginJson = data.getJSONObject(i)
-                                val plugin = Plugin(
-                                    name = pluginJson.getString("name"),
-                                    enabled = pluginJson.getBoolean("enabled")
-                                )
-                                plugins.add(plugin)
+                    message ?: return
+                    try {
+                        val baseMessage = json.decodeFromString<BaseMessage>(message)
+                        when (baseMessage.type) {
+                            "ui_update" -> {
+                                val uiUpdate = json.decodeFromString<UiUpdateMessage>(message)
+                                val data = uiUpdate.data
+                                face = data.face
+                                val notificationText = "CH: ${data.channel} | APS: ${data.aps} | UP: ${data.uptime} | PWND: ${data.shakes} | MODE: ${data.mode}"
+                                _uiState.value = PwnagotchiUiState.Connected(notificationText, handshakes, plugins, face, emptyList(), communityPlugins)
+                                updateNotification(notificationText)
                             }
-                            _uiState.value = PwnagotchiUiState.Connected("Plugins loaded", handshakes, plugins, face, emptyList(), communityPlugins)
-                        }
-                        "community_plugin_list" -> {
-                            val data = json.getJSONArray("data")
-                            communityPlugins.clear()
-                            for (i in 0 until data.length()) {
-                                val pluginJson = data.getJSONObject(i)
-                                val plugin = CommunityPlugin(
-                                    name = pluginJson.getString("name"),
-                                    description = pluginJson.getString("description")
+                            "handshake" -> {
+                                val handshakeMsg = json.decodeFromString<HandshakeMessage>(message)
+                                val data = handshakeMsg.data
+                                val handshake = Handshake(
+                                    ap = data.ap.hostname,
+                                    sta = data.sta.mac,
+                                    filename = data.filename
                                 )
-                                communityPlugins.add(plugin)
+                                handshakes.add(handshake)
+                                _uiState.value = PwnagotchiUiState.Connected("New handshake captured!", handshakes, plugins, face, emptyList(), communityPlugins)
+                                showHandshakeNotification(handshake)
                             }
-                            _uiState.value = PwnagotchiUiState.Connected("Community plugins loaded", handshakes, plugins, face, emptyList(), communityPlugins)
+                            "plugin_list" -> {
+                                val pluginListMsg = json.decodeFromString<PluginListMessage>(message)
+                                plugins.clear()
+                                plugins.addAll(pluginListMsg.data.map { Plugin(it.name, it.enabled) })
+                                _uiState.value = PwnagotchiUiState.Connected("Plugins loaded", handshakes, plugins, face, emptyList(), communityPlugins)
+                            }
+                            "community_plugin_list" -> {
+                                val communityPluginListMsg = json.decodeFromString<CommunityPluginListMessage>(message)
+                                communityPlugins.clear()
+                                communityPlugins.addAll(communityPluginListMsg.data.map { CommunityPlugin(it.name, it.description) })
+                                _uiState.value = PwnagotchiUiState.Connected("Community plugins loaded", handshakes, plugins, face, emptyList(), communityPlugins)
+                            }
                         }
+                    } catch (e: Exception) {
+                        // Handle serialization exception
+                        _uiState.value = PwnagotchiUiState.Error("Error parsing message: ${e.message}")
                     }
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                    _uiState.value = PwnagotchiUiState.Disconnected("Connection closed. Reconnecting...")
-                    updateNotification("Connection closed. Reconnecting...")
-                    scheduleReconnect()
+                    _uiState.value = PwnagotchiUiState.Disconnected("Connection closed.")
+                    updateNotification("Connection closed.")
+                    needsReconnect = true
+                    if (isNetworkAvailable) {
+                        scheduleReconnect()
+                    }
                 }
 
                 override fun onError(ex: Exception?) {
                     _uiState.value = PwnagotchiUiState.Error(ex?.message ?: "Unknown error")
-                    scheduleReconnect()
+                    needsReconnect = true
+                    if (isNetworkAvailable) {
+                        scheduleReconnect()
+                    }
                 }
             }
             webSocketClient?.connect()
         } catch (e: Exception) {
             _uiState.value = PwnagotchiUiState.Error(e.message ?: "Unknown connection error")
-            scheduleReconnect()
+            needsReconnect = true
+            if (isNetworkAvailable) {
+                scheduleReconnect()
+            }
         }
     }
 
     fun disconnect() {
+        needsReconnect = false
         reconnectionJob?.cancel()
         webSocketClient?.close()
         _uiState.value = PwnagotchiUiState.Disconnected("Disconnected by user")
@@ -206,6 +229,25 @@ class PwnagotchiService : Service() {
         super.onDestroy()
         serviceScope.cancel()
         webSocketClient?.close()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
+
+    private fun createNetworkCallback(): ConnectivityManager.NetworkCallback {
+        return object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                isNetworkAvailable = true
+                if (needsReconnect) {
+                    scheduleReconnect()
+                }
+            }
+
+            override fun onLost(network: Network) {
+                isNetworkAvailable = false
+                reconnectionJob?.cancel()
+                _uiState.value = PwnagotchiUiState.Disconnected("Network lost. Awaiting connection...")
+                updateNotification("Network lost")
+            }
+        }
     }
 
     private fun updateNotification(contentText: String) {

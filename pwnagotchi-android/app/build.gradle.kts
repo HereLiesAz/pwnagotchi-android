@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.pwnagotchi.pwnagotchiandroid"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.pwnagotchi.pwnagotchiandroid"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -59,9 +59,12 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("org.java-websocket:Java-WebSocket:1.5.6")
+    implementation("org.java-websocket:Java-WebSocket:1.6.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("io.ktor:ktor-client-core:3.3.1")
+    implementation("io.ktor:ktor-client-cio:3.3.1")
+    implementation("io.ktor:ktor-client-content-negotiation:3.3.1")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
     implementation("com.github.topjohnwu.libsu:core:5.2.2")
     implementation("com.github.topjohnwu.libsu:service:5.2.2")
     testImplementation("junit:junit:4.13.2")
