@@ -1,15 +1,17 @@
 package com.pwnagotchi.pwnagotchiandroid
 
+import android.content.Context
 import com.pwnagotchi.pwnagotchiandroid.core.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class OpwngridClient {
+class OpwngridClient(private val context: Context) {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
@@ -19,11 +21,13 @@ class OpwngridClient {
     }
 
     suspend fun getLeaderboard(): List<LeaderboardEntry> {
+        val sharedPreferences = context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+        val apiKey = sharedPreferences.getString("opwngrid_api_key", "") ?: ""
         return try {
-            // Placeholder URL, as the real API is unknown
-            client.get(Constants.OPWNGRID_API_BASE_URL + "leaderboard").body()
+            client.get(Constants.OPWNGRID_API_BASE_URL + "leaderboard") {
+                header("X-API-KEY", apiKey)
+            }.body()
         } catch (e: Exception) {
-            // In a real app, this would be handled more gracefully
             emptyList()
         }
     }

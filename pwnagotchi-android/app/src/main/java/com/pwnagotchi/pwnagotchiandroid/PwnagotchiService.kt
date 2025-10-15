@@ -42,7 +42,7 @@ class PwnagotchiService : Service() {
     private lateinit var connectivityManager: ConnectivityManager
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private var isNetworkAvailable = false
-    private val opwngridClient = OpwngridClient()
+    private lateinit var opwngridClient: OpwngridClient
 
     inner class LocalBinder : Binder() {
         fun getService(): PwnagotchiService = this@PwnagotchiService
@@ -50,6 +50,7 @@ class PwnagotchiService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        opwngridClient = OpwngridClient(this)
         connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         networkCallback = createNetworkCallback()
         val networkRequest = NetworkRequest.Builder()

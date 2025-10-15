@@ -42,6 +42,9 @@ fun SettingsScreen(
     var theme by remember {
         mutableStateOf(sharedPreferences.getString("theme", "System") ?: "System")
     }
+    var apiKey by remember {
+        mutableStateOf(sharedPreferences.getString("opwngrid_api_key", "") ?: "")
+    }
 
     Column(
         modifier = Modifier
@@ -53,6 +56,13 @@ fun SettingsScreen(
             value = host,
             onValueChange = { host = it },
             label = { Text(stringResource(id = R.string.websocket_host)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = apiKey,
+            onValueChange = { apiKey = it },
+            label = { Text(stringResource(id = R.string.opwngrid_api_key)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -76,6 +86,7 @@ fun SettingsScreen(
             sharedPreferences.edit()
                 .putString("host", host)
                 .putString("theme", theme)
+                .putString("opwngrid_api_key", apiKey)
                 .apply()
             onSave(host)
             onBack()
