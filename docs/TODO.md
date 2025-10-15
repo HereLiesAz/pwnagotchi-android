@@ -66,8 +66,8 @@ This phase addresses major architectural and user interface flaws, focusing on n
 - [x] **Step 3.3.3: Fix Theme Switching Logic**
     - [x] Correct the status bar appearance logic in `PwnagotchiAndroidTheme.kt` to correctly reflect the chosen light/dark theme.
 
-- [ ] **Step 3.3.4: Add Missing Drawable Resources**
-    - [ ] Create the missing vector drawable files (`face_happy.xml`, `face_sad.xml`, `face_bored.xml`) to prevent runtime crashes.
+- [x] **Step 3.3.4: Add Missing Drawable Resources**
+    - [x] Create the missing vector drawable files (`face_happy.xml`, `face_sad.xml`, `face_bored.xml`) to prevent runtime crashes.
 
 - [ ] **Step 3.3.5: Address the Incomplete Root Feature**
     - [ ] **Decision:** Remove the feature.
