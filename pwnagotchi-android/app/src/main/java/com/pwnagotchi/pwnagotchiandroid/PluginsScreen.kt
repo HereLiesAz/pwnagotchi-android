@@ -28,7 +28,7 @@ fun PluginsScreen(
     onBack: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Installed", "Discover")
+    val tabs = listOf(stringResource(id = R.string.installed), stringResource(id = R.string.discover))
 
     Scaffold(
         topBar = {
