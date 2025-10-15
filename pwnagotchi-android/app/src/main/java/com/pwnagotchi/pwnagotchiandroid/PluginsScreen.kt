@@ -24,6 +24,7 @@ fun PluginsScreen(
     installedPlugins: List<Plugin>,
     communityPlugins: List<CommunityPlugin>,
     onTogglePlugin: (String, Boolean) -> Unit,
+    onInstallPlugin: (String) -> Unit,
     onBack: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
@@ -53,7 +54,7 @@ fun PluginsScreen(
             }
             when (selectedTab) {
                 0 -> InstalledPluginsScreen(plugins = installedPlugins, onTogglePlugin = onTogglePlugin)
-                1 -> DiscoverPluginsScreen(plugins = communityPlugins)
+                1 -> DiscoverPluginsScreen(plugins = communityPlugins, onInstallPlugin = onInstallPlugin)
             }
         }
     }

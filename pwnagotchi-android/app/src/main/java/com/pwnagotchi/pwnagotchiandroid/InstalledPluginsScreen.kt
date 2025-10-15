@@ -11,7 +11,7 @@ fun InstalledPluginsScreen(
 ) {
     LazyColumn {
         items(plugins) { plugin ->
-            PluginItem(plugin = plugin, onToggle = { onTogglePlugin(plugin.name, it) })
+            PluginItem(plugin = plugin, onToggle = { enabled -> onTogglePlugin(plugin.name, enabled) })
         }
     }
 }

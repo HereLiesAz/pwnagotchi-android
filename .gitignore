@@ -27,3 +27,12 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Android
+pwnagotchi-android/app/local.properties
+pwnagotchi-android/.gradle
+*.hprof
+
+# SSL certificate
+key.pem
+cert.pem
