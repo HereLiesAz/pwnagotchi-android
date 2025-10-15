@@ -1,93 +1,175 @@
-# Pwnagotchi Android: Production Readiness Roadmap
+# Pwnagotchi Android: A Comprehensive Guide to Production Readiness
 
-This document outlines a comprehensive, multi-phase roadmap to transform the Pwnagotchi Android application from its current prototype state into a stable, maintainable, and production-ready product. This roadmap is derived from a detailed project audit.
+## Executive Summary
 
-## Phase 1: Foundational Stability - Build & Dependencies
+This document provides an exhaustive, step-by-step engineering guide for transitioning the Pwnagotchi Android application from its current prototype state to a production-ready release suitable for the Google Play Store. The directive focuses on four critical pillars: foundational modernization and architectural refactoring, core functionality implementation and security hardening, user experience refinement and performance optimization, and final release preparations.
 
-This initial phase focuses on stabilizing the project's foundation by updating its build environment and dependencies. This is a prerequisite for all subsequent work.
+The execution plan is predicated on a mandatory build environment consisting of Android API 36, Android Gradle Plugin (AGP) 8.14.0, and Kotlin 2.2.20. The provided project source code serves as the baseline, and this guide systematically addresses its architectural deficiencies, incomplete features, security vulnerabilities, and outdated configurations. Each phase and its constituent steps are designed to be atomic and actionable, providing the necessary context, code modifications, and validation procedures to ensure a high-quality, secure, and performant final product.
 
-- [x] **Step 3.1.1: Update Gradle and Android Gradle Plugin (AGP)**
-    - [x] Modify `gradle/wrapper/gradle-wrapper.properties` to use a modern, stable Gradle version (e.g., 8.13).
-    - [x] Ensure the root `build.gradle.kts` specifies a compatible, stable AGP version (e.g., 8.13.0).
+## Phase 1: Foundational Modernization and Architectural Refactoring
 
-- [x] **Step 3.1.2: Correct SDK and Tooling Versions**
-    - [x] In `app/build.gradle.kts`, change `compileSdk` and `targetSdk` from preview version 36 to the latest stable version (e.g., 35).
-    - [x] Remove the explicit `buildToolsVersion` definition from `app/build.gradle.kts`.
+The initial phase is critical for establishing a stable and modern foundation. It addresses underlying architectural and configuration issues that would otherwise compromise the stability, security, and maintainability of the final product. The objective is to rectify these foundational problems before implementing new features or undertaking performance optimizations.
 
-- [x] **Step 3.1.3: Overhaul Project Dependencies**
-    - [x] Replace the outdated Compose BOM `2023.03.00` with the latest stable version (e.g., `2025.10.00`).
-    - [x] Remove explicit versions from all `androidx.compose` dependencies to let the BOM manage them.
-    - [x] Update all other outdated dependencies (AndroidX, Ktor, Java-WebSocket) to their latest stable versions as detailed in the audit.
-    - [x] Remove the legacy Material 2 dependency: `com.google.android.material:material`.
+### Section 1.1: Build Environment Upgrade and Dependency Modernization
 
-- [x] **Step 3.1.4: Sync and Resolve Breaking Changes**
-    - [x] Perform a Gradle sync.
-    - [x] Systematically compile and address all breaking API changes resulting from the dependency upgrades, paying close attention to Ktor (2.x to 3.x) and Jetpack libraries.
+The first priority is to align the project's build environment with the specified modern toolchain. This ensures access to the latest features, security patches, and performance improvements, while also mitigating risks associated with outdated libraries. The target environment—AGP 8.14.0 and Kotlin 2.2.20—necessitates a corresponding upgrade of the Gradle build tool itself, as major AGP versions are tightly coupled with major Gradle versions.
 
-## Phase 2: Codebase Refactoring & Modernization
+The Kotlin Gradle Plugin (KGP) version 2.2.20 is compatible with Gradle versions up to 8.14, making the specified configuration technically viable and stable. The following steps will bring the project into compliance.
 
-With a stable build environment, this phase focuses on improving code quality, eliminating anti-patterns, and increasing the application's robustness.
+**Actionable Steps:**
 
-- [x] **Step 3.2.1: Centralize Constants**
-    - [x] Create a new `Constants.kt` file for application-wide constants.
-    - [x] Move hardcoded values (IP addresses, ports, API URLs) into this file.
-    - [x] Refactor the codebase to reference these constants.
+1.  **Upgrade Gradle Wrapper:** The project must be updated to use Gradle 8.14. This is accomplished by running the wrapper task from the project's root directory: `./gradlew wrapper --gradle-version=8.14`
+2.  **Update Android Gradle Plugin (AGP):** Modify the top-level `build.gradle.kts` file to specify the target AGP version.
+    *   **File:** `./build.gradle.kts`
+    *   **Modification:** Change the version from `8.13.0` to `8.14.0`.
+3.  **Dependency Audit and Update:** A comprehensive audit of the dependencies listed in `app/build.gradle.kts` reveals several outdated libraries. These must be updated to their latest stable versions to ensure compatibility with API 36 and the new build tools.
+4.  **Ktor Engine Optimization:** The current implementation uses the `ktor-client-cio` engine. For Android, Ktor provides a dedicated `ktor-client-android` engine that leverages the platform's native networking stack. Migrating to this engine offers better performance and battery efficiency.
+    *   **File:** `app/build.gradle.kts` - Replace `ktor-client-cio` with `ktor-client-android`.
+    *   **File:** `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/OpwngridClient.kt` - Update the `HttpClient` instantiation to use the `Android` engine.
 
-- [x] **Step 3.2.2: Implement Type-Safe Serialization**
-    - [x] Define `@Serializable` data classes for all WebSocket message structures.
-    - [x] Refactor `PwnagotchiService.kt`'s `onMessage` callback to use `kotlinx.serialization` for JSON parsing, removing all `org.json.JSONObject` usage.
+### Section 1.2: Navigation Architecture Overhaul with Jetpack Navigation Compose
 
-- [x] **Step 3.2.3: Refactor State Management to a Single Source of Truth**
-    - [x] In `PwnagotchiViewModel.kt`, remove logic that directly modifies UI state from `fetchLeaderboard`. The ViewModel should only delegate calls to the service. *(Note: This issue was already resolved in the codebase.)*
-    - [ ] In `PwnagotchiService.kt`, create a new `fetchLeaderboard` function that performs the network call and updates the service's internal state, which will then emit an updated `uiState`.
+The application's current navigation mechanism, implemented within `MainActivity.kt` using mutable boolean state flags, is a significant architectural liability. A complete refactoring to a modern, decoupled navigation architecture using Jetpack Navigation Compose is a prerequisite for a production-quality application.
 
-- [x] **Step 3.2.4: Implement Robust Reconnection Logic**
-    - [x] Refactor `scheduleReconnect` in `PwnagotchiService.kt` to be network-aware.
-    - [x] Use `ConnectivityManager` to listen for network availability and only attempt reconnection when a valid network is present.
+**Actionable Steps:**
 
-- [x] **Step 3.2.5: Externalize All UI Strings**
-    - [x] Move all hardcoded user-facing strings from Composables into `app/src/main/res/values/strings.xml`.
-    - [x] Replace hardcoded strings in the code with `stringResource()` calls.
+1.  **Add Navigation Dependency:** Incorporate the `androidx.navigation:navigation-compose` library.
+2.  **Define Navigation Routes:** Create a centralized, type-safe definition for all navigation destinations in a new file, `AppScreens.kt`.
+3.  **Refactor Screens to be Stateless:** Modify each screen composable to accept a `NavController` instance or specific navigation lambda functions as parameters.
+4.  **Implement NavHost:** Overhaul `MainActivity.kt` to use the `NavHost` composable to manage screen transitions, completely removing the previous `when` block based on boolean flags.
 
-## Phase 3: Architectural and UI Refinement
+### Section 1.3: Implementing a Centralized User Feedback System
 
-This phase addresses major architectural and user interface flaws, focusing on navigation, theming, and resource correctness.
+The current application lacks a mechanism for providing transient, non-intrusive feedback for common operations. Snackbars are the ideal Material Design component for this purpose.
 
-- [x] **Step 3.3.1: Implement Jetpack Navigation Compose**
-    - [x] Add the `androidx.navigation:navigation-compose` dependency.
-    - [x] Create a sealed class to define navigation routes.
-    - [x] Replace the boolean-flag-based navigation in `MainActivity.kt` with a `NavHost` and composable destinations for a proper back stack.
+**Actionable Steps:**
 
-- [x] **Step 3.3.2: Unify Theming to Material 3**
-    - [x] Delete legacy M2 theme and color files (`themes.xml`, `colors.xml`).
-    - [x] Update `AndroidManifest.xml` to use a non-MaterialComponents base theme.
-    - [x] Ensure `PwnagotchiAndroidTheme.kt` exclusively uses `androidx.compose.material3` APIs.
+1.  **Establish a Central Scaffold:** Wrap the `NavHost` in a single, top-level `Scaffold` within `MainActivity` to host the `SnackbarHost`.
+2.  **Instantiate SnackbarHostState:** Create and remember a `SnackbarHostState` object and a `CoroutineScope` within the composition.
+3.  **Create a UI Event Channel in ViewModel:** Use a `SharedFlow` in `PwnagotchiViewModel.kt` to emit one-time UI events, such as showing a snackbar.
+4.  **Observe Events and Display Snackbars:** Use a `LaunchedEffect` in `MainActivity.kt` to collect events from the `eventFlow` and command the `snackbarHostState` to display messages.
+5.  **Trigger Events from Logic Layers:** Refactor the `PwnagotchiService` and `PwnagotchiViewModel` to emit events for transient feedback.
 
-- [x] **Step 3.3.3: Fix Theme Switching Logic**
-    - [x] Correct the status bar appearance logic in `PwnagotchiAndroidTheme.kt` to correctly reflect the chosen light/dark theme.
+## Phase 2: Core Functionality Implementation and Security Hardening
 
-- [x] **Step 3.3.4: Add Missing Drawable Resources**
-    - [x] Create the missing vector drawable files (`face_happy.xml`, `face_sad.xml`, `face_bored.xml`) to prevent runtime crashes.
+This phase focuses on implementing the application's most complex and unique features while simultaneously establishing a robust security posture.
 
-- [x] **Step 3.3.5: Address the Incomplete Root Feature**
-    - [x] **Decision:** Remove the feature.
-    - [x] Delete the `com.github.topjohnwu.libsu` dependency.
-    - [x] Remove the `RootControls` composable and all related root-checking logic.
+### Section 2.1: Activating the Local Agent (Root Mode)
 
-## Phase 4: Production Hardening
+The "local agent" mode, designed to leverage the Android device's own hardware for Wi-Fi monitoring, is contingent on root access and is currently unimplemented. A production-ready implementation must adopt a strategy pattern, attempting a sequence of known methods to enable monitor mode.
 
-The final phase involves preparing the application for a public release.
+**Actionable Steps:**
 
-- [x] **Step 3.4.1: Enable Code Shrinking and Obfuscation**
-    - [x] In `app/build.gradle.kts`, set `isMinifyEnabled` to `true` for the `release` build type.
+1.  **Create LocalAgentManager:** Develop a new class to encapsulate all logic related to root operations for the local agent.
+2.  **Implement Monitor Mode Strategy:**
+    *   Define a sequence of methods to attempt enabling monitor mode (e.g., `iwconfig`, `airmon-ng`, Qualcomm `con_mode`).
+    *   Use `libsu`'s `Shell.cmd()` to execute commands and capture both `stdout` and `stderr`.
+    *   After each attempt, verify the outcome by parsing the output of `iwconfig wlan0`.
+3.  **Integrate with UI and Service:** Add a "Start Local Agent" button, provide clear real-time feedback on the process, and handle success or failure gracefully.
 
-- [x] **Step 3.4.2: Configure ProGuard/R8 Rules**
-    - [x] Add necessary `-keep` rules to `proguard-rules.pro` to prevent R8 from removing classes used via reflection by `kotlinx.serialization`.
+### Section 2.2: Finalizing oPwngrid Integration via Web Scraping
 
-- [ ] **Step 3.4.3: Final API Endpoint Verification**
-    - [ ] Investigate and verify a stable, public API endpoint for oPwngrid leaderboard data.
-    - [ ] If no reliable endpoint is found, disable or remove the feature from the UI.
+The `OpwngridClient` is currently non-functional as it attempts to call a non-existent API endpoint. The strategy must pivot from API consumption to HTML web scraping.
 
-- [ ] **Step 3.4.4: Remove All Logging and TODOs**
-    - [ ] Conduct a project-wide search to remove all debug logging (`Log.d`, `e.printStackTrace()`).
-    - [ ] Resolve or remove all remaining `// TODO` comments.
+**Actionable Steps:**
+
+1.  **Add Jsoup Dependency:** Include the `org.jsoup:jsoup` library for HTML parsing.
+2.  **Refactor OpwngridClient.getLeaderboard():** Rewrite the function to:
+    *   Fetch the raw HTML of the leaderboard page using Ktor.
+    *   Parse the HTML using Jsoup to traverse the DOM and extract the required data.
+3.  **Implement Robust Error Handling:** Web scraping is fragile. The implementation must handle potential failures gracefully and communicate them to the user.
+
+### Section 2.3: Comprehensive Application Hardening
+
+The current release build configuration is insecure, with code shrinking and obfuscation disabled. Enabling R8 (Android's default shrinker and obfuscator) is the single most important security measure to implement.
+
+**Actionable Steps:**
+
+1.  **Enable R8 and Resource Shrinking:** In `app/build.gradle.kts`, set `isMinifyEnabled = true` and `isShrinkResources = true` for the `release` build type.
+2.  **Populate proguard-rules.pro:** Add the necessary Proguard "keep" rules to prevent R8 from breaking code that relies on reflection, especially for libraries like Kotlinx Serialization, Ktor, libsu, and Jetpack Compose.
+3.  **Secure Android Manifest:** Disable unencrypted backups by setting `android:allowBackup="false"` in `AndroidManifest.xml`.
+
+## Phase 3: User Experience Polish and Performance Optimization
+
+This phase focuses on refining the application to be intuitive, helpful, and efficient for the end-user.
+
+### Section 3.1: Designing an Intuitive Onboarding Experience
+
+A guided, multi-page onboarding flow is essential to manage user expectations, explain the app's purpose and requirements, and handle initial permission requests.
+
+**Actionable Steps:**
+
+1.  **Add Pager Dependency:** Ensure the foundation library, which includes `HorizontalPager`, is up-to-date.
+2.  **Create Onboarding Screen and Data Model:** Define a new `OnboardingScreen.kt` that uses a `HorizontalPager` to display a series of informative pages.
+3.  **Implement Navigation and State Management:** Use `rememberPagerState` to track the current page and include UI elements for navigation ("Next," "Skip").
+4.  **Integrate Permission Request:** On one of the pages, explain why notifications are used and include a button to trigger the `POST_NOTIFICATIONS` runtime permission request.
+5.  **Integrate with Main Navigation:** Use `SharedPreferences` or `DataStore` to track whether the user has completed the onboarding flow. The app's start destination will be determined by this flag.
+
+### Section 3.2: Performance Profiling and Optimization
+
+A production-ready application must be responsive and efficient. Use the Android Studio Profiler to investigate potential performance hotspots.
+
+**Key Areas for Profiling:**
+
+*   **UI Rendering (Jank):** The `LazyColumn` for the handshake list.
+*   **Background Service (Remote Mode):** The `PwnagotchiService`'s WebSocket connection and data processing.
+*   **Background Service (Local Mode):** The execution of root commands.
+
+**Actionable Steps:**
+
+1.  **Profile UI Rendering Performance:** Use "System Trace" to find frames that exceed the 16ms rendering budget and use the Layout Inspector's "Recomposition Counts" to identify and fix unnecessary recompositions.
+2.  **Profile Background Service (Remote Mode):** Use the "Energy Profiler" to monitor the app's battery consumption and the CPU Profiler to find sources of unnecessary work.
+3.  **Profile Background Service (Local Mode):** Repeat the Energy and CPU profiling process to identify optimizations, such as batching commands or reducing the frequency of status checks.
+
+## Phase 4: Production Release and Deployment
+
+This final phase covers all technical and logistical steps required to prepare, sign, and publish the application to the Google Play Store.
+
+### Section 4.1: Pre-Release Asset and Configuration Checklist
+
+A polished and professional store presence is crucial for user trust and adoption.
+
+**Actionable Steps:**
+
+1.  **Generate Production-Quality App Icons:** Create a full set of adaptive icons using Android Studio's "Image Asset Studio."
+2.  **Finalize Versioning:** Set the initial production release to `versionCode = 1` and `versionName = "1.0.0"`. Increment `versionCode` for every subsequent release.
+3.  **Review and Refine All User-Facing Strings:** Audit every string in `strings.xml` for clarity, grammar, and consistency.
+4.  **Prepare Google Play Store Listing Assets:** Create high-resolution screenshots, a feature graphic, and a detailed app description.
+
+### Section 4.2: Generating a Signed Release Artifact
+
+Android requires that all applications be cryptographically signed with a developer key.
+
+**Actionable Steps:**
+
+1.  **Generate an Upload Keystore:** Use the `keytool` utility to generate a new private keystore. This file must be kept private and secure.
+2.  **Secure Keystore Credentials:** Store the keystore passwords and alias securely in the user's global `~/.gradle/gradle.properties` file, not in the project's build scripts.
+3.  **Configure build.gradle.kts for Signing:** Create a `signingConfigs` block that reads these properties and applies them to the `release` build type.
+4.  **Build the Signed Android App Bundle (AAB):** Generate the final, signed release artifact using the `./gradlew bundleRelease` task.
+
+### Section 4.3: Google Play Store Deployment Guide
+
+The final step is to publish the signed AAB to the Google Play Store.
+
+**Final Release Checklist:**
+
+1.  **Asset Finalization:**
+    *   [ ] Generate adaptive launcher icons.
+    *   [ ] Finalize `versionCode=1` and `versionName="1.0.0"`.
+    *   [ ] Review all user-facing strings.
+    *   [ ] Prepare store listing text and screenshots.
+2.  **Build Artifact:**
+    *   [ ] Generate a private upload keystore.
+    *   [ ] Configure signing in `build.gradle.kts`.
+    *   [ ] Enable R8 with a complete `proguard-rules.pro`.
+    *   [ ] Build the signed release AAB.
+3.  **Play Console:**
+    *   [ ] Create a new application in the Google Play Console.
+    *   [ ] Complete all required store listing sections.
+    *   [ ] Upload the signed AAB to the "Internal Testing" track.
+    *   [ ] Add internal testers and distribute the release.
+4.  **Staged Rollout:**
+    *   [ ] Promote the release from "Internal Testing" to "Production."
+    *   [ ] Select the "Staged rollout" option, starting with a small percentage (e.g., 5%).
+    *   [ ] Monitor crash reports and user feedback in the Play Console.
+    *   [ ] Gradually increase the rollout percentage to 100%.
