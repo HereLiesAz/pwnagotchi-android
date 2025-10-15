@@ -1,8 +1,10 @@
 package com.pwnagotchi.pwnagotchiandroid
 
+import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.navigation.compose.NavHost
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
@@ -10,12 +12,16 @@ import androidx.navigation.compose.rememberNavController
 fun NavGraph(
     mainViewModel: PwnagotchiViewModel,
     onTogglePlugin: (String, Boolean) -> Unit,
-    onInstallPlugin: (String) -> Unit,
     onSaveSettings: (String, String) -> Unit,
     onReconnect: () -> Unit
 ) {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+    val ipAddress = sharedPreferences.getString("ip_address", null)
+    val startDestination = if (ipAddress == null) "settings" else "main"
+
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "main") {
+    NavHost(navController = navController, startDestination = startDestination) {
         composable("main") {
             val uiState = mainViewModel.uiState.collectAsState().value
             when (uiState) {
@@ -50,7 +56,6 @@ fun NavGraph(
                     installedPlugins = uiState.plugins,
                     communityPlugins = uiState.communityPlugins,
                     onTogglePlugin = onTogglePlugin,
-                    onInstallPlugin = onInstallPlugin,
                     onBack = { navController.popBackStack() }
                 )
             }

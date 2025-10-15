@@ -1,5 +1,6 @@
 package com.pwnagotchi.pwnagotchiandroid
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -23,10 +24,12 @@ fun PwnagotchiScreen(
                 "(·•ᴗ• ·)" -> R.drawable.pwnagotchi_happy
                 else -> R.drawable.pwnagotchi_neutral
             }
-            Image(
-                painter = painterResource(id = face),
-                contentDescription = "Pwnagotchi Face"
-            )
+            Crossfade(targetState = face) { faceResId ->
+                Image(
+                    painter = painterResource(id = faceResId),
+                    contentDescription = "Pwnagotchi Face"
+                )
+            }
             Text(text = uiState.status)
         }
         Button(onClick = onNavigateToSettings) {
