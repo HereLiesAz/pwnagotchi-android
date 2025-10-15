@@ -8,12 +8,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun PwnagotchiScreen(
     viewModel: PwnagotchiViewModel,
     onNavigateToSettings: () -> Unit,
-    onNavigateToPlugins: () -> Unit
+    onNavigateToPlugins: () -> Unit,
+    onNavigateToOpwngrid: () -> Unit
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     Column {
@@ -27,16 +29,19 @@ fun PwnagotchiScreen(
             Crossfade(targetState = face) { faceResId ->
                 Image(
                     painter = painterResource(id = faceResId),
-                    contentDescription = "Pwnagotchi Face"
+                    contentDescription = stringResource(id = R.string.pwnagotchi_face)
                 )
             }
             Text(text = uiState.status)
         }
         Button(onClick = onNavigateToSettings) {
-            Text("Settings")
+            Text(stringResource(id = R.string.settings))
+        }
+        Button(onClick = onNavigateToOpwngrid) {
+            Text(stringResource(id = R.string.opwngrid))
         }
         Button(onClick = onNavigateToPlugins) {
-            Text("Plugins")
+            Text(stringResource(id = R.string.plugins))
         }
     }
 }
