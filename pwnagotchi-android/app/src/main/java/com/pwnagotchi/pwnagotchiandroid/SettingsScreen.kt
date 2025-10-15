@@ -76,6 +76,12 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
+            // TODO: Implement custom theme loading
+        }) {
+            Text("Select Custom Theme")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
             sharedPreferences.edit()
                 .putString("ip_address", ipAddress)
                 .putString("host", host)

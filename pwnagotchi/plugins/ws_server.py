@@ -39,6 +39,10 @@ class WSServer(plugins.Plugin):
                         await self._send_plugin_list(websocket)
                     elif command == "get_community_plugins":
                         await self._send_community_plugin_list(websocket)
+                    elif command == "install_community_plugin":
+                        plugin_name = data.get("plugin_name")
+                        self._install_community_plugin(plugin_name)
+                        await self._send_plugin_list(websocket)
                 except json.JSONDecodeError:
                     logging.error("ws_server: Invalid JSON received.")
                 except Exception as e:
@@ -107,3 +111,19 @@ class WSServer(plugins.Plugin):
 
     async def _send_community_plugin_list(self, websocket):
         await websocket.send(json.dumps({"type": "community_plugin_list", "data": self.community_plugins}))
+
+    def _install_community_plugin(self, plugin_name):
+        import subprocess
+        import sys
+        import re
+        # Sanitize the plugin name to prevent command injection
+        if not re.match(r"^[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$", plugin_name):
+            logging.error(f"Invalid plugin name: {plugin_name}")
+            return
+        plugin_url = f"https://github.com/{plugin_name}.git"
+        plugin_path = f"/opt/pwnagotchi/custom-plugins/{plugin_name.split('/')[1]}"
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--target", plugin_path, f"git+{plugin_url}"])
+            logging.info(f"Successfully installed community plugin: {plugin_name}")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to install community plugin: {plugin_name}. Error: {e}")

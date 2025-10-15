@@ -50,6 +50,9 @@ class MainActivity : ComponentActivity() {
                         onTogglePlugin = { pluginName, enabled ->
                             pwnagotchiService?.togglePlugin(pluginName, enabled)
                         },
+                        onInstallPlugin = { pluginName ->
+                            pwnagotchiService?.installCommunityPlugin(pluginName)
+                        },
                         onSaveSettings = { ipAddress, host ->
                             val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
                             sharedPreferences.edit()
