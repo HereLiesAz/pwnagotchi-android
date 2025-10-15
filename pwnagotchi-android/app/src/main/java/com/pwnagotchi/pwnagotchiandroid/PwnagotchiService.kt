@@ -66,9 +66,8 @@ class PwnagotchiService : Service() {
         val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", getString(R.string.notification_service_running))
         startForeground(1, notification)
         val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-        val ipAddress = sharedPreferences.getString("ip_address", null)
-        val host = sharedPreferences.getString("host", "127.0.0.1") ?: "127.0.0.1"
-        if (ipAddress != null) {
+        val host = sharedPreferences.getString("host", null)
+        if (host != null) {
             connect(URI("wss://$host:8765"))
         }
         return START_STICKY

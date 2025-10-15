@@ -2,9 +2,9 @@
 
 This document outlines the next steps for improving the Pwnagotchi Android application, focusing on enhancing stability, user experience, and feature completeness.
 
-- [ ] **Step 1: Simplify Reconnection Logic**
-    - [ ] Refactor `PwnagotchiService` to simplify the reconnection mechanism.
-    - [ ] Remove the `needsReconnect` flag and rely on a more streamlined approach.
+- [x] **Step 1: Simplify Reconnection Logic**
+    - [x] Refactor `PwnagotchiService` to simplify the reconnection mechanism.
+    - [x] Remove the `needsReconnect` flag and rely on a more streamlined approach.
 
 - [ ] **Step 2: Streamline Settings**
     - [ ] Remove the redundant `ip_address` from `SharedPreferences` and the `onSaveSettings` function.
