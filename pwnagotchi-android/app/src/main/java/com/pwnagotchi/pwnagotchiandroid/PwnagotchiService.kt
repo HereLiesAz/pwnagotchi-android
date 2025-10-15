@@ -23,12 +23,11 @@ import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 
-// TODO: Acknowledge the suggestion to split this large PR into smaller, focused PRs in the future.
 class PwnagotchiService : Service() {
 
     private val binder = LocalBinder()
     private var webSocketClient: WebSocketClient? = null
-    private val _uiState = MutableStateFlow<PwnagotchiUiState>(PwnagotchiUiState.Disconnected("Not connected"))
+    private val _uiState = MutableStateFlow<PwnagotchiUiState>(PwnagotchiUiState.Disconnected(getString(R.string.status_not_connected)))
     val uiState: StateFlow<PwnagotchiUiState> = _uiState
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
@@ -64,7 +63,7 @@ class PwnagotchiService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", "Pwnagotchi service is running")
+        val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", getString(R.string.notification_service_running))
         startForeground(1, notification)
         val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
         val ipAddress = sharedPreferences.getString("ip_address", null)
@@ -81,12 +80,12 @@ class PwnagotchiService : Service() {
         reconnectionJob?.cancel() // Cancel any previous reconnection attempts
         webSocketClient?.close() // Close any existing connection
 
-        _uiState.value = PwnagotchiUiState.Connecting("Connecting to $uri...")
+        _uiState.value = PwnagotchiUiState.Connecting(getString(R.string.status_connecting, uri.toString()))
         try {
             webSocketClient = object : WebSocketClient(uri) {
                 override fun onOpen(handshakedata: ServerHandshake?) {
-                    _uiState.value = PwnagotchiUiState.Connected("Connected", handshakes, plugins, face, emptyList(), communityPlugins)
-                    updateNotification("Connected to Pwnagotchi")
+                    _uiState.value = PwnagotchiUiState.Connected(getString(R.string.status_connected), handshakes, plugins, face, emptyList(), communityPlugins)
+                    updateNotification(getString(R.string.status_connected_to_pwnagotchi))
                     listPlugins()
                     getCommunityPlugins()
                 }
@@ -113,31 +112,31 @@ class PwnagotchiService : Service() {
                                     filename = data.filename
                                 )
                                 handshakes.add(handshake)
-                                _uiState.value = PwnagotchiUiState.Connected("New handshake captured!", handshakes, plugins, face, emptyList(), communityPlugins)
+                                _uiState.value = PwnagotchiUiState.Connected(getString(R.string.status_new_handshake), handshakes, plugins, face, emptyList(), communityPlugins)
                                 showHandshakeNotification(handshake)
                             }
                             "plugin_list" -> {
                                 val pluginListMsg = json.decodeFromString<PluginListMessage>(message)
                                 plugins.clear()
                                 plugins.addAll(pluginListMsg.data.map { Plugin(it.name, it.enabled) })
-                                _uiState.value = PwnagotchiUiState.Connected("Plugins loaded", handshakes, plugins, face, emptyList(), communityPlugins)
+                                _uiState.value = PwnagotchiUiState.Connected(getString(R.string.status_plugins_loaded), handshakes, plugins, face, emptyList(), communityPlugins)
                             }
                             "community_plugin_list" -> {
                                 val communityPluginListMsg = json.decodeFromString<CommunityPluginListMessage>(message)
                                 communityPlugins.clear()
                                 communityPlugins.addAll(communityPluginListMsg.data.map { CommunityPlugin(it.name, it.description) })
-                                _uiState.value = PwnagotchiUiState.Connected("Community plugins loaded", handshakes, plugins, face, emptyList(), communityPlugins)
+                                _uiState.value = PwnagotchiUiState.Connected(getString(R.string.status_community_plugins_loaded), handshakes, plugins, face, emptyList(), communityPlugins)
                             }
                         }
                     } catch (e: Exception) {
                         // Handle serialization exception
-                        _uiState.value = PwnagotchiUiState.Error("Error parsing message: ${e.message}")
+                        _uiState.value = PwnagotchiUiState.Error(getString(R.string.error_parsing_message, e.message))
                     }
                 }
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
-                    _uiState.value = PwnagotchiUiState.Disconnected("Connection closed.")
-                    updateNotification("Connection closed.")
+                    _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_connection_closed))
+                    updateNotification(getString(R.string.status_connection_closed))
                     needsReconnect = true
                     if (isNetworkAvailable) {
                         scheduleReconnect()
@@ -145,7 +144,7 @@ class PwnagotchiService : Service() {
                 }
 
                 override fun onError(ex: Exception?) {
-                    _uiState.value = PwnagotchiUiState.Error(ex?.message ?: "Unknown error")
+                    _uiState.value = PwnagotchiUiState.Error(ex?.message ?: getString(R.string.error_unknown))
                     needsReconnect = true
                     if (isNetworkAvailable) {
                         scheduleReconnect()
@@ -154,7 +153,7 @@ class PwnagotchiService : Service() {
             }
             webSocketClient?.connect()
         } catch (e: Exception) {
-            _uiState.value = PwnagotchiUiState.Error(e.message ?: "Unknown connection error")
+            _uiState.value = PwnagotchiUiState.Error(e.message ?: getString(R.string.error_unknown_connection))
             needsReconnect = true
             if (isNetworkAvailable) {
                 scheduleReconnect()
@@ -166,8 +165,8 @@ class PwnagotchiService : Service() {
         needsReconnect = false
         reconnectionJob?.cancel()
         webSocketClient?.close()
-        _uiState.value = PwnagotchiUiState.Disconnected("Disconnected by user")
-        updateNotification("Disconnected")
+        _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_disconnected_by_user))
+        updateNotification(getString(R.string.status_disconnected_by_user))
     }
 
     private fun isWebSocketOpen(): Boolean {
@@ -178,7 +177,7 @@ class PwnagotchiService : Service() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"list_plugins\"}")
         } else {
-            _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
+            _uiState.value = PwnagotchiUiState.Error(getString(R.string.error_websocket_not_open))
         }
     }
 
@@ -186,7 +185,7 @@ class PwnagotchiService : Service() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"toggle_plugin\", \"plugin_name\": \"$pluginName\", \"enabled\": $enabled}")
         } else {
-            _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
+            _uiState.value = PwnagotchiUiState.Error(getString(R.string.error_websocket_not_open))
         }
     }
 
@@ -194,7 +193,7 @@ class PwnagotchiService : Service() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"get_community_plugins\"}")
         } else {
-            _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
+            _uiState.value = PwnagotchiUiState.Error(getString(R.string.error_websocket_not_open))
         }
     }
 
@@ -202,7 +201,7 @@ class PwnagotchiService : Service() {
         if (isWebSocketOpen()) {
             webSocketClient?.send("{\"command\": \"install_community_plugin\", \"plugin_name\": \"$pluginName\"}")
         } else {
-            _uiState.value = PwnagotchiUiState.Error("WebSocket is not open.")
+            _uiState.value = PwnagotchiUiState.Error(getString(R.string.error_websocket_not_open))
         }
     }
 
@@ -213,7 +212,7 @@ class PwnagotchiService : Service() {
             var delayMs = 1000L
             val maxDelayMs = 60000L
             while (attempts < maxReconnectionAttempts) {
-                _uiState.value = PwnagotchiUiState.Connecting("Reconnection attempt ${attempts + 1} of $maxReconnectionAttempts...")
+                _uiState.value = PwnagotchiUiState.Connecting(getString(R.string.status_reconnection_attempt, attempts + 1, maxReconnectionAttempts))
                 delay(delayMs)
                 currentUri?.let {
                     webSocketClient?.reconnect()
@@ -221,7 +220,7 @@ class PwnagotchiService : Service() {
                 delayMs = (delayMs * 2).coerceAtMost(maxDelayMs)
                 attempts++
             }
-            _uiState.value = PwnagotchiUiState.Error("Failed to reconnect after $maxReconnectionAttempts attempts.")
+            _uiState.value = PwnagotchiUiState.Error(getString(R.string.error_failed_to_reconnect, maxReconnectionAttempts))
         }
     }
 
@@ -244,8 +243,8 @@ class PwnagotchiService : Service() {
             override fun onLost(network: Network) {
                 isNetworkAvailable = false
                 reconnectionJob?.cancel()
-                _uiState.value = PwnagotchiUiState.Disconnected("Network lost. Awaiting connection...")
-                updateNotification("Network lost")
+                _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_network_lost))
+                updateNotification(getString(R.string.notification_network_lost))
             }
         }
     }
@@ -257,7 +256,7 @@ class PwnagotchiService : Service() {
     }
 
     private fun showHandshakeNotification(handshake: Handshake) {
-        val contentText = "Captured handshake from ${handshake.ap}"
+        val contentText = getString(R.string.notification_handshake_captured, handshake.ap)
         val notification = NotificationHelper.createNotification(this, "handshake_channel", "Handshake Notifications", contentText, NotificationManager.IMPORTANCE_HIGH)
         val manager = getSystemService(NotificationManager::class.java)
         manager.notify(2, notification)

@@ -45,9 +45,9 @@ With a stable build environment, this phase focuses on improving code quality, e
     - [x] Refactor `scheduleReconnect` in `PwnagotchiService.kt` to be network-aware.
     - [x] Use `ConnectivityManager` to listen for network availability and only attempt reconnection when a valid network is present.
 
-- [ ] **Step 3.2.5: Externalize All UI Strings**
-    - [ ] Move all hardcoded user-facing strings from Composables into `app/src/main/res/values/strings.xml`.
-    - [ ] Replace hardcoded strings in the code with `stringResource()` calls.
+- [x] **Step 3.2.5: Externalize All UI Strings**
+    - [x] Move all hardcoded user-facing strings from Composables into `app/src/main/res/values/strings.xml`.
+    - [x] Replace hardcoded strings in the code with `stringResource()` calls.
 
 ## Phase 3: Architectural and UI Refinement
 

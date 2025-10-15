@@ -62,7 +62,7 @@ fun SettingsScreen(
         OutlinedTextField(
             value = host,
             onValueChange = { host = it },
-            label = { Text("WebSocket Host") },
+            label = { Text(stringResource(id = R.string.websocket_host)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -79,7 +79,7 @@ fun SettingsScreen(
         Button(onClick = {
             // TODO: Implement custom theme loading
         }) {
-            Text("Select Custom Theme")
+            Text(stringResource(id = R.string.select_custom_theme))
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
