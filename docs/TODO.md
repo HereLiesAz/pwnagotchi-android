@@ -69,10 +69,10 @@ This phase addresses major architectural and user interface flaws, focusing on n
 - [x] **Step 3.3.4: Add Missing Drawable Resources**
     - [x] Create the missing vector drawable files (`face_happy.xml`, `face_sad.xml`, `face_bored.xml`) to prevent runtime crashes.
 
-- [ ] **Step 3.3.5: Address the Incomplete Root Feature**
-    - [ ] **Decision:** Remove the feature.
-    - [ ] Delete the `com.github.topjohnwu.libsu` dependency.
-    - [ ] Remove the `RootControls` composable and all related root-checking logic.
+- [x] **Step 3.3.5: Address the Incomplete Root Feature**
+    - [x] **Decision:** Remove the feature.
+    - [x] Delete the `com.github.topjohnwu.libsu` dependency.
+    - [x] Remove the `RootControls` composable and all related root-checking logic.
 
 ## Phase 4: Production Hardening
 

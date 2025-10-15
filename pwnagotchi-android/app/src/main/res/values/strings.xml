@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Pwnagotchi Android</string>
-    <string name="check_root_access">Check Root Access</string>
     <string name="pwnagotchi_ip">Pwnagotchi IP</string>
     <string name="theme">Theme</string>
     <string name="system">System</string>
