@@ -27,28 +27,16 @@ The Kotlin Gradle Plugin (KGP) version 2.2.20 is compatible with Gradle versions
     *   **File:** `app/build.gradle.kts` - Replace `ktor-client-cio` with `ktor-client-android`.
     *   **File:** `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/OpwngridClient.kt` - Update the `HttpClient` instantiation to use the `Android` engine.
 
-### Section 1.2: Navigation Architecture Overhaul with Jetpack Navigation Compose
+### Section 1.2: Navigation Architecture Overhaul with AzNavRail
 
-The application's current navigation mechanism, implemented within `MainActivity.kt` using mutable boolean state flags, is a significant architectural liability. A complete refactoring to a modern, decoupled navigation architecture using Jetpack Navigation Compose is a prerequisite for a production-quality application.
+The application's current navigation mechanism, implemented within `MainActivity.kt` using mutable boolean state flags, is a significant architectural liability. A complete refactoring to a modern, decoupled navigation architecture using the AzNavRail component is a prerequisite for a production-quality application.
 
 **Actionable Steps:**
 
-1.  **Add Navigation Dependency:** Incorporate the `androidx.navigation:navigation-compose` library.
-2.  **Define Navigation Routes:** Create a centralized, type-safe definition for all navigation destinations in a new file, `AppScreens.kt`.
+1.  **Add AzNavRail Dependency:** Incorporate the `AzNavRail` library from `https://github.com/HereLiesAz/AzNavRail`.
+2.  **Define Navigation Routes:** Create a centralized, type-safe definition for all navigation destinations.
 3.  **Refactor Screens to be Stateless:** Modify each screen composable to accept a `NavController` instance or specific navigation lambda functions as parameters.
-4.  **Implement NavHost:** Overhaul `MainActivity.kt` to use the `NavHost` composable to manage screen transitions, completely removing the previous `when` block based on boolean flags.
-
-### Section 1.3: Implementing a Centralized User Feedback System
-
-The current application lacks a mechanism for providing transient, non-intrusive feedback for common operations. Snackbars are the ideal Material Design component for this purpose.
-
-**Actionable Steps:**
-
-1.  **Establish a Central Scaffold:** Wrap the `NavHost` in a single, top-level `Scaffold` within `MainActivity` to host the `SnackbarHost`.
-2.  **Instantiate SnackbarHostState:** Create and remember a `SnackbarHostState` object and a `CoroutineScope` within the composition.
-3.  **Create a UI Event Channel in ViewModel:** Use a `SharedFlow` in `PwnagotchiViewModel.kt` to emit one-time UI events, such as showing a snackbar.
-4.  **Observe Events and Display Snackbars:** Use a `LaunchedEffect` in `MainActivity.kt` to collect events from the `eventFlow` and command the `snackbarHostState` to display messages.
-5.  **Trigger Events from Logic Layers:** Refactor the `PwnagotchiService` and `PwnagotchiViewModel` to emit events for transient feedback.
+4.  **Implement AzNavRail:** Overhaul `MainActivity.kt` to use the `AzNavRail` composable to manage screen transitions and the navigation rail, completely removing the previous `when` block based on boolean flags.
 
 ## Phase 2: Core Functionality Implementation and Security Hardening
 
@@ -131,39 +119,21 @@ A polished and professional store presence is crucial for user trust and adoptio
 
 **Actionable Steps:**
 
-1.  **Generate Production-Quality App Icons:** Create a full set of adaptive icons using Android Studio's "Image Asset Studio."
-2.  **Finalize Versioning:** Set the initial production release to `versionCode = 1` and `versionName = "1.0.0"`. Increment `versionCode` for every subsequent release.
-3.  **Review and Refine All User-Facing Strings:** Audit every string in `strings.xml` for clarity, grammar, and consistency.
-4.  **Prepare Google Play Store Listing Assets:** Create high-resolution screenshots, a feature graphic, and a detailed app description.
+1.  **Finalize Versioning:** Set the initial production release to `versionCode = 1` and `versionName = "1.0.0"`. Increment `versionCode` for every subsequent release.
+2.  **Review and Refine All User-Facing Strings:** Audit every string in `strings.xml` for clarity, grammar, and consistency.
+3.  **Prepare Google Play Store Listing Assets:** Create high-resolution screenshots, a feature graphic, and a detailed app description.
 
-### Section 4.2: Generating a Signed Release Artifact
-
-Android requires that all applications be cryptographically signed with a developer key.
-
-**Actionable Steps:**
-
-1.  **Generate an Upload Keystore:** Use the `keytool` utility to generate a new private keystore. This file must be kept private and secure.
-2.  **Secure Keystore Credentials:** Store the keystore passwords and alias securely in the user's global `~/.gradle/gradle.properties` file, not in the project's build scripts.
-3.  **Configure build.gradle.kts for Signing:** Create a `signingConfigs` block that reads these properties and applies them to the `release` build type.
-4.  **Build the Signed Android App Bundle (AAB):** Generate the final, signed release artifact using the `./gradlew bundleRelease` task.
-
-### Section 4.3: Google Play Store Deployment Guide
+### Section 4.2: Google Play Store Deployment Guide
 
 The final step is to publish the signed AAB to the Google Play Store.
 
 **Final Release Checklist:**
 
 1.  **Asset Finalization:**
-    *   [ ] Generate adaptive launcher icons.
     *   [ ] Finalize `versionCode=1` and `versionName="1.0.0"`.
     *   [ ] Review all user-facing strings.
     *   [ ] Prepare store listing text and screenshots.
-2.  **Build Artifact:**
-    *   [ ] Generate a private upload keystore.
-    *   [ ] Configure signing in `build.gradle.kts`.
-    *   [ ] Enable R8 with a complete `proguard-rules.pro`.
-    *   [ ] Build the signed release AAB.
-3.  **Play Console:**
+2.  **Play Console:**
     *   [ ] Create a new application in the Google Play Console.
     *   [ ] Complete all required store listing sections.
     *   [ ] Upload the signed AAB to the "Internal Testing" track.
