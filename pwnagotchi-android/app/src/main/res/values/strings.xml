@@ -35,4 +35,6 @@
     <string name="notification_handshake_captured">Captured handshake from %1$s</string>
     <string name="opwngrid">oPwngrid</string>
     <string name="opwngrid_api_key">oPwngrid API Key</string>
+    <string name="screen_home">Home</string>
+    <string name="screen_opwngrid">oPwngrid</string>
 </resources>

@@ -12,6 +12,10 @@ class PwnagotchiViewModel : ViewModel() {
     val uiState: StateFlow<PwnagotchiUiState> = _uiState
     private var pwnagotchiService: PwnagotchiService? = null
 
+    val opwngridViewModel: OpwngridViewModel by lazy {
+        OpwngridViewModel(OpwngridClient())
+    }
+
     fun setService(service: PwnagotchiService?) {
         pwnagotchiService = service
         viewModelScope.launch {
