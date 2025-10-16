@@ -48,11 +48,15 @@ class MainActivity : ComponentActivity() {
             PwnagotchiAndroidTheme {
                 MainScreen(
                     pwnagotchiUiState = pwnagotchiUiState,
-                    onConnect = { host -> pwnagotchiService?.connect(URI("wss://$host:8765")) },
                     onDisconnect = { pwnagotchiService?.disconnect() },
                     onTogglePlugin = { plugin, enabled -> pwnagotchiService?.togglePlugin(plugin, enabled) },
                     onInstallPlugin = { plugin -> pwnagotchiService?.installCommunityPlugin(plugin) },
-                    onSaveSettings = { host, _, _ -> pwnagotchiService?.connect(URI("wss://$host:8765")) }
+                    onSaveSettings = { host, _, _ -> pwnagotchiService?.connect(URI("wss://$host:8765")) },
+                    onReconnect = {
+                        val sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE)
+                        val host = sharedPreferences.getString("host", "10.0.0.2") ?: "10.0.0.2"
+                        pwnagotchiService?.connect(URI("wss://$host:8765"))
+                    }
                 )
             }
         }

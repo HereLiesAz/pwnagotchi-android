@@ -1,12 +1,13 @@
-package com.pwnagotchi.pwnagotchiandroid
+package com.pwnagotchi.pwnagotchiandroid.ui.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.pwnagotchi.pwnagotchiandroid.R
 
 sealed class Screen(val route: String, @StringRes val title: Int, val icon: ImageVector) {
     object Home : Screen("home", R.string.home, Icons.Default.Home)
