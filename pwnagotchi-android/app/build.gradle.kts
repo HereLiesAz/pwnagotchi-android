@@ -84,7 +84,7 @@ dependencies {
     implementation("com.github.topjohnwu.libsu:service:6.0.0")
 
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.8.0-beta05")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Glance (Widgets)
     implementation("androidx.glance:glance-appwidget:1.1.1")
@@ -92,6 +92,9 @@ dependencies {
 
     // DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // AzNavRail
+    implementation("com.github.HereLiesAz:AzNavRail:3.13")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

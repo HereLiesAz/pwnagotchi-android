@@ -45,9 +45,10 @@ class RemotePwnagotchiSource(private val context: Context) : PwnagotchiDataSourc
     }
 
 
-    override suspend fun start(params: Map<String, Any>) {
-        val uri = params["uri"] as? URI ?: return
-        connect(uri)
+    override suspend fun start(params: DataSourceParams?) {
+        if (params is DataSourceParams.Remote) {
+            connect(params.uri)
+        }
     }
 
     private fun connect(uri: URI) {

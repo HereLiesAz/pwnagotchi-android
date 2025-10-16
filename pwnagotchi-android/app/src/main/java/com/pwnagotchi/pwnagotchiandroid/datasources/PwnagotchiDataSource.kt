@@ -20,10 +20,11 @@ interface PwnagotchiDataSource {
     /**
      * Starts the data source.
      *
-     * @param params A map of optional parameters required for starting the source
-     *               (e.g., a URI for a remote connection).
+     * @param params The parameters required for starting the source, encapsulated in a
+     *               type-safe sealed class. This is nullable for data sources that do not
+     *               require parameters (e.g., the local agent).
      */
-    suspend fun start(params: Map<String, Any> = emptyMap())
+    suspend fun start(params: DataSourceParams? = null)
 
     /**
      * Stops the data source and cleans up any resources.

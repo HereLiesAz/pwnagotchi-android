@@ -16,7 +16,7 @@ class LocalPwnagotchiSource(private val context: Context) : PwnagotchiDataSource
     private val _uiState = MutableStateFlow<PwnagotchiUiState>(PwnagotchiUiState.Disconnected("Local Agent not started"))
     override val uiState: StateFlow<PwnagotchiUiState> = _uiState
 
-    override suspend fun start(params: Map<String, Any>) {
+    override suspend fun start(params: DataSourceParams?) {
         // TODO: Implement in a future phase
     }
 
