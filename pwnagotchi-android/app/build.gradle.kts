@@ -56,31 +56,48 @@ android {
 }
 
 dependencies {
-
-    implementation("com.google.android.material:material:1.12.0")
+    // Core & Lifecycle
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     implementation("androidx.activity:activity-compose:1.9.0")
-    implementation(platform("androidx.compose:compose-bom:2024.04.00"))
+
+    // Compose BOM
+    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("org.java-websocket:Java-WebSocket:1.6.0")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // Material Components (Legacy)
+    implementation("com.google.android.material:material:1.12.0")
+
+    // Networking - Ktor & WebSocket
     implementation("io.ktor:ktor-client-core:3.3.1")
     implementation("io.ktor:ktor-client-android:3.3.1")
     implementation("io.ktor:ktor-client-content-negotiation:3.3.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
+    implementation("org.java-websocket:Java-WebSocket:1.6.0")
+
+    // Root Access - libsu
+    implementation("com.github.topjohnwu.libsu:core:6.0.0")
+    implementation("com.github.topjohnwu.libsu:service:6.0.0")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.8.0-beta05")
+
+    // Glance (Widgets)
     implementation("androidx.glance:glance-appwidget:1.1.1")
     implementation("androidx.glance:glance-material3:1.1.1")
+
+    // DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("com.github.topjohnwu.libsu:core:5.2.2")
+
+    // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
