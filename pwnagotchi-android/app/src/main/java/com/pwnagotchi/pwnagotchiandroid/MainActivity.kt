@@ -15,21 +15,6 @@ import com.pwnagotchi.pwnagotchiandroid.ui.MainScreen
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
 import java.net.URI
 
-/**
- * The main and only activity of the application.
- *
- * This activity is responsible for:
- * - Launching and binding to the `PwnagotchiService`.
- * - Hosting the Jetpack Compose UI.
- * - Providing the `PwnagotchiViewModel` to the UI layer.
- *
- * FUTURE ARCHITECTURE:
- * This Activity's `setContent` block will be significantly refactored. It will host the
- * `MainScreen` composable, which will contain the new `AzNavRail` and `NavHost` for
- * managing the application's navigation. The current system of passing many individual
- * lambdas to the `MainScreen` will be replaced by passing the `PwnagotchiViewModel`
- * and a `NavController` instance, creating a cleaner and more scalable UI architecture.
- */
 class MainActivity : ComponentActivity() {
     private var pwnagotchiService: PwnagotchiService? = null
     private var isBound = false
