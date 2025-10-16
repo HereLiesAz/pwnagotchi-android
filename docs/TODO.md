@@ -22,19 +22,19 @@ The Kotlin Gradle Plugin (KGP) version 2.2.20 is compatible with Gradle versions
 2.  **Update Android Gradle Plugin (AGP):** Modify the top-level `build.gradle.kts` file to specify the target AGP version.
     *   **File:** `./build.gradle.kts`
     *   **Modification:** Change the version from `8.13.0` to `8.14.0`.
-3.  **Dependency Audit and Update:** A comprehensive audit of the dependencies listed in `app/build.gradle.kts` reveals several outdated libraries. These must be updated to their latest stable versions to ensure compatibility with API 36 and the new build tools.
-4.  **Ktor Engine Optimization:** The current implementation uses the `ktor-client-cio` engine. For Android, Ktor provides a dedicated `ktor-client-android` engine that leverages the platform's native networking stack. Migrating to this engine offers better performance and battery efficiency.
-    *   **File:** `app/build.gradle.kts` - Replace `ktor-client-cio` with `ktor-client-android`.
-    *   **File:** `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/OpwngridClient.kt` - Update the `HttpClient` instantiation to use the `Android` engine.
+- [x] **Dependency Audit and Update:** A comprehensive audit of the dependencies listed in `app/build.gradle.kts` has been completed.
+- [x] **Ktor Engine Optimization:** The Ktor client has been migrated from the `cio` engine to the `android` engine for better performance. This included updating the ProGuard rules.
 
-### Section 1.2: Navigation Architecture Overhaul with AzNavRail
+### Section 1.2: Implementing Dual-Mode Architecture
+- [x] **Define Data Source Abstraction:** The `PwnagotchiDataSource.kt` interface has been created.
+- [x] **Create `RemotePwnagotchiSource`:** All WebSocket logic has been migrated from the service to this new data source.
+- [x] **Create `LocalPwnagotchiSource`:** A placeholder class has been created for the local agent mode.
+- [x] **Refactor `PwnagotchiService` as a Mode Controller:** The service has been refactored to delegate all operations to the active data source (`Local` or `Remote`).
 
-The application's current navigation mechanism, implemented within `MainActivity.kt` using mutable boolean state flags, is a significant architectural liability. A complete refactoring to a modern, decoupled navigation architecture using the AzNavRail component is a prerequisite for a production-quality application.
+## Phase 2: UI Refactoring for Dual-Mode Operation
 
-**Actionable Steps:**
-
-1.  **Add AzNavRail Dependency:** Incorporate the `AzNavRail` library from `https://github.com/HereLiesAz/AzNavRail`.
-2.  **Define Navigation Routes:** Create a centralized, type-safe definition for all navigation destinations.
+### Section 2.1: Implementing AzNavRail and NavHost
+- [ ] **Define Navigation Graph:** Create a `Screen.kt` sealed class to define all navigation routes, titles, and icons.
 3.  **Refactor Screens to be Stateless:** Modify each screen composable to accept a `NavController` instance or specific navigation lambda functions as parameters.
 4.  **Implement AzNavRail:** Overhaul `MainActivity.kt` to use the `AzNavRail` composable to manage screen transitions and the navigation rail, completely removing the previous `when` block based on boolean flags.
 
