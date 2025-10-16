@@ -64,7 +64,7 @@ fun MainScreen(viewModel: PwnagotchiViewModel) {
                     PluginsScreen(pluginsViewModel)
                 }
                 composable(Screen.Opwngrid.route) {
-                    val opwngridViewModel: OpwngridViewModel = viewModel(factory = OpwngridViewModelFactory(viewModel.getApplication()))
+                    val opwngridViewModel: OpwngridViewModel = viewModel(factory = OpwngridViewModelFactory(viewModel.getApplication() as android.app.Application))
                     OpwngridScreen(opwngridViewModel)
                 }
                 composable(Screen.Settings.route) {
