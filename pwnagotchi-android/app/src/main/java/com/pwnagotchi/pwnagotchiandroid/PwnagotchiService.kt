@@ -23,6 +23,24 @@ import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 
+/**
+ * A background service responsible for managing the connection to a Pwnagotchi device.
+ *
+ * This service maintains a persistent WebSocket connection, handles incoming messages,
+ * manages the application's UI state, and orchestrates reconnection logic.
+ *
+ * FUTURE ARCHITECTURE:
+ * This service is slated for a major refactoring to support a dual-mode architecture.
+ * It will act as a controller, delegating all Pwnagotchi interactions to one of two
+ * data sources:
+ * 1.  `RemotePwnagotchiSource`: Manages WebSocket connections to an external Pwnagotchi device
+ *     (the current functionality).
+ * 2.  `LocalPwnagotchiSource`: Manages a native `bettercap` instance running on a rooted
+ *     Android device, turning the phone itself into a Pwnagotchi.
+ *
+ * The `activeDataSource` will be determined by the user's selection in the UI (`AppMode`),
+ * and this service will simply route commands and collect state from the active source.
+ */
 class PwnagotchiService : Service() {
 
     private val binder = LocalBinder()
