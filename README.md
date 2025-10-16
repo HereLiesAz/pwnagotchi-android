@@ -1,4 +1,4 @@
-# Pwnagotchi: Android Super App
+# pwnagotchi On Android
 
 This project's goal is to create the ultimate Android application for Pwnagotchi enthusiasts. It is a "Super App" that can operate in two distinct modes, providing a comprehensive mobile solution for both interacting with and *becoming* a Pwnagotchi.
 
