@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp")
+    id("com.google.devtools.ksp") version "2.2.20-2.0.3"
 }
 
 android {
@@ -11,7 +11,7 @@ android {
   defaultConfig {
         applicationId = "com.pwnagotchi.pwnagotchiandroid"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
