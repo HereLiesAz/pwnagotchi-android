@@ -35,4 +35,8 @@
     <string name="notification_handshake_captured">Captured handshake from %1$s</string>
     <string name="opwngrid">oPwngrid</string>
     <string name="opwngrid_api_key">oPwngrid API Key</string>
+    <string name="status_widget_description">Pwnagotchi Status</string>
+    <string name="handshake_log_widget_description">Handshake Log</string>
+    <string name="quick_actions_widget_description">Quick Actions</string>
+    <string name="leaderboard_widget_description">oPwngrid Leaderboard</string>
 </resources>
