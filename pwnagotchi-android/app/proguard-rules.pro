@@ -1,19 +1,20 @@
 # Kotlin
--dontwarn kotlin.**
+-dontwarn kotlin.reflect.jvm.internal.**
 
 # Kotlinx Serialization
--keepclassmembers class kotlinx.serialization.internal.* {
-    *;
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @kotlinx.serialization.Serializable <methods>;
 }
--keep class kotlinx.serialization.internal.* {
-    *;
-}
--keepclassmembers class **.serializer {
-    *;
+-keepclassmembers class **$$serializer {
+    <methods>;
 }
 
 # Ktor
--keep class io.ktor.** { *; }
+-keep class io.ktor.client.engine.cio.** { *; }
+-keep class io.ktor.client.plugins.websocket.** { *; }
+-keep class io.ktor.client.plugins.contentnegotiation.** { *; }
+-keep class io.ktor.serialization.kotlinx.json.** { *; }
 -dontwarn io.ktor.**
 -dontwarn org.slf4j.**
 
@@ -21,11 +22,9 @@
 -keep class com.topjohnwu.superuser.** { *; }
 
 # Jetpack Compose
--keep class androidx.compose.** { *; }
--keepclassmembers class androidx.compose.** { *; }
--dontwarn androidx.compose.**
+-keep class androidx.compose.runtime.** { *; }
+-keepclassmembers class androidx.compose.runtime.** { *; }
 
 # Jetpack Glance
--keep class androidx.glance.** { *; }
--keepclassmembers class androidx.glance.** { *; }
--dontwarn androidx.glance.**
+-keep class androidx.glance.appwidget.** { *; }
+-keepclassmembers class androidx.glance.appwidget.** { *; }

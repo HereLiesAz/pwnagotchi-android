@@ -21,9 +21,9 @@ class StatusWidget : GlanceAppWidget() {
         Column(modifier = GlanceModifier.padding(8.dp)) {
             Image(
                 provider = ImageProvider(
-                    when {
-                        state.face.contains("happy") -> R.drawable.pwnagotchi_happy
-                        state.face.contains("sad") -> R.drawable.pwnagotchi_sad
+                    when (state.face) {
+                        "(•‿•)", "(•́‿•̀)", "(^‿^)" -> R.drawable.pwnagotchi_happy
+                        "(☓‿‿☓)", "(#__#)", "(-__-)" -> R.drawable.pwnagotchi_sad
                         else -> R.drawable.pwnagotchi_neutral
                     }
                 ),

@@ -13,7 +13,11 @@ class LeaderboardWidget : GlanceAppWidget() {
     @Composable
     override fun Content() {
         val state = currentState<WidgetState>()
-        val leaderboard = Json.decodeFromString<List<LeaderboardEntry>>(state.leaderboard)
+        val leaderboard = try {
+            Json.decodeFromString<List<LeaderboardEntry>>(state.leaderboard)
+        } catch (e: Exception) {
+            emptyList()
+        }
 
         LazyColumn {
             items(leaderboard) { entry ->

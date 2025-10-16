@@ -12,7 +12,11 @@ class HandshakeLogWidget : GlanceAppWidget() {
     @Composable
     override fun Content() {
         val state = currentState<WidgetState>()
-        val handshakes = Json.decodeFromString<List<com.pwnagotchi.pwnagotchiandroid.Handshake>>(state.handshakes)
+        val handshakes = try {
+            Json.decodeFromString<List<com.pwnagotchi.pwnagotchiandroid.Handshake>>(state.handshakes)
+        } catch (e: Exception) {
+            emptyList()
+        }
 
         LazyColumn {
             items(handshakes) { handshake ->

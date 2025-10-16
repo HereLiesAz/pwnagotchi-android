@@ -39,6 +39,4 @@
     <string name="handshake_log_widget_description">Handshake Log</string>
     <string name="quick_actions_widget_description">Quick Actions</string>
     <string name="leaderboard_widget_description">oPwngrid Leaderboard</string>
-    <string name="screen_home">Home</string>
-    <string name="screen_opwngrid">oPwngrid</string>
 </resources>
