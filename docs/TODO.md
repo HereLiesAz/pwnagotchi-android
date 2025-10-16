@@ -27,17 +27,9 @@ The Kotlin Gradle Plugin (KGP) version 2.2.20 is compatible with Gradle versions
 
 ### Section 1.2: Implementing Dual-Mode Architecture
 - [x] **Define Data Source Abstraction:** The `PwnagotchiDataSource.kt` interface has been created.
-- [ ] **Create `RemotePwnagotchiSource`:**
-    - [ ] Create the `datasources` package.
-    - [ ] Create the `RemotePwnagotchiSource.kt` class.
-    - [ ] Move all WebSocket connection and communication logic from `PwnagotchiService` into this new class.
-- [ ] **Create `LocalPwnagotchiSource`:**
-    - [ ] Create the `LocalPwnagotchiSource.kt` class as a placeholder that implements the `PwnagotchiDataSource` interface.
-- [ ] **Refactor `PwnagotchiService` as a Mode Controller:**
-    - [ ] Introduce an `AppMode` enum (`LOCAL`, `REMOTE`).
-    - [ ] Modify the service to hold instances of `LocalPwnagotchiSource` and `RemotePwnagotchiSource`.
-    - [ ] Implement a `setMode` function to switch the `activeDataSource`.
-    - [ ] Delegate `connect`, `disconnect`, and `sendCommand` calls to the `activeDataSource`.
+- [x] **Create `RemotePwnagotchiSource`:** All WebSocket logic has been migrated from the service to this new data source.
+- [x] **Create `LocalPwnagotchiSource`:** A placeholder class has been created for the local agent mode.
+- [x] **Refactor `PwnagotchiService` as a Mode Controller:** The service has been refactored to delegate all operations to the active data source (`Local` or `Remote`).
 
 ## Phase 2: UI Refactoring for Dual-Mode Operation
 
