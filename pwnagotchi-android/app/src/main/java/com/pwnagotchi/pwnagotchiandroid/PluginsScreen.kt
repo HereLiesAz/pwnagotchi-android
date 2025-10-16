@@ -20,7 +20,8 @@ import androidx.compose.ui.res.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PluginsScreen(
-    uiState: PwnagotchiUiState,
+    plugins: List<Plugin>,
+    communityPlugins: List<CommunityPlugin>,
     onTogglePlugin: (String, Boolean) -> Unit,
     onInstallPlugin: (String) -> Unit
 ) {
@@ -44,11 +45,9 @@ fun PluginsScreen(
                     )
                 }
             }
-            if (uiState is PwnagotchiUiState.Connected) {
-                when (selectedTab) {
-                    0 -> InstalledPluginsScreen(plugins = uiState.plugins, onTogglePlugin = onTogglePlugin)
-                    1 -> DiscoverPluginsScreen(plugins = uiState.communityPlugins, onInstallPlugin = onInstallPlugin)
-                }
+            when (selectedTab) {
+                0 -> InstalledPluginsScreen(plugins = plugins, onTogglePlugin = onTogglePlugin)
+                1 -> DiscoverPluginsScreen(plugins = communityPlugins, onInstallPlugin = onInstallPlugin)
             }
         }
     }

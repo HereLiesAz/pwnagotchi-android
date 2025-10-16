@@ -1,17 +1,21 @@
 package com.pwnagotchi.pwnagotchiandroid.ui
 
 import androidx.compose.runtime.Composable
-import com.pwnagotchi.pwnagotchiandroid.PwnagotchiViewModel
+import com.pwnagotchi.pwnagotchiandroid.PwnagotchiUiState
+import com.pwnagotchi.pwnagotchiandroid.PluginsScreen
 
 @Composable
 fun PluginsScreenNav(
-    mainViewModel: PwnagotchiViewModel,
+    pwnagotchiUiState: PwnagotchiUiState,
     onTogglePlugin: (String, Boolean) -> Unit,
     onInstallPlugin: (String) -> Unit
 ) {
-    PluginsScreen(
-        uiState = mainViewModel.uiState.value,
-        onTogglePlugin = onTogglePlugin,
-        onInstallPlugin = onInstallPlugin
-    )
+    if (pwnagotchiUiState is PwnagotchiUiState.Connected) {
+        PluginsScreen(
+            plugins = pwnagotchiUiState.plugins,
+            communityPlugins = pwnagotchiUiState.communityPlugins,
+            onTogglePlugin = onTogglePlugin,
+            onInstallPlugin = onInstallPlugin
+        )
+    }
 }

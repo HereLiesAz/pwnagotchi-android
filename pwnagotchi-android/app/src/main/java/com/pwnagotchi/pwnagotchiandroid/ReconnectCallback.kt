@@ -2,10 +2,12 @@ package com.pwnagotchi.pwnagotchiandroid
 
 import android.content.Context
 import android.content.Intent
+import androidx.glance.GlanceId
+import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
 
 class ReconnectCallback : ActionCallback {
-    override suspend fun onRun(context: Context, glanceId: androidx.glance.GlanceId, parameters: androidx.glance.action.ActionParameters) {
+    override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val intent = Intent(context, PwnagotchiService::class.java).apply {
             action = "com.pwnagotchi.pwnagotchiandroid.RECONNECT"
         }
