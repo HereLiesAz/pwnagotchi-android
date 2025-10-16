@@ -4,7 +4,7 @@ import android.content.Context
 import com.pwnagotchi.pwnagotchiandroid.core.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -12,7 +12,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 class OpwngridClient(private val context: Context) {
-    private val client = HttpClient(CIO) {
+    private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
