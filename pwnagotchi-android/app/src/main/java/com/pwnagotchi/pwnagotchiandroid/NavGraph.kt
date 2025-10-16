@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.Text
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -65,7 +66,8 @@ fun NavGraph(
             }
         }
         composable(Screen.Opwngrid.route) {
-            OpwngridScreen()
+            val opwngridViewModel: OpwngridViewModel = viewModel(factory = OpwngridViewModelFactory(context))
+            OpwngridScreen(viewModel = opwngridViewModel)
         }
     }
 }

@@ -15,10 +15,10 @@ This document outlines the next steps for improving the Pwnagotchi Android appli
     - [x] Store the API key securely in `SharedPreferences`.
     - [x] Update `OpwngridClient` to use the stored API key.
 
-- [ ] **Step 4: Implement `OpwngridViewModel`**
-    - [ ] Create a new `OpwngridViewModel` to manage the state of the oPwngrid feature.
-    - [ ] The ViewModel should handle fetching the leaderboard, managing loading and error states, and exposing the data to the UI.
+- [x] **Step 4: Implement `OpwngridViewModel`**
+    - [x] Create a new `OpwngridViewModel` to manage the state of the oPwngrid feature.
+    - [x] The ViewModel should handle fetching the leaderboard, managing loading and error states, and exposing the data to the UI.
 
-- [ ] **Step 5: Add Loading Indicator to oPwngrid**
-    - [ ] Update the `OpwngridScreen` to display a loading indicator while the leaderboard is being fetched.
-    - [ ] The screen should also handle and display error states.
+- [x] **Step 5: Add Loading Indicator to oPwngrid**
+    - [x] Update the `OpwngridScreen` to display a loading indicator while the leaderboard is being fetched.
+    - [x] The screen should also handle and display error states.
