@@ -10,8 +10,6 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.text.Text
 import androidx.glance.GlanceId
 import com.pwnagotchi.pwnagotchiandroid.Handshake
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 class HandshakeLogWidget : GlanceAppWidget() {
@@ -19,8 +17,12 @@ class HandshakeLogWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             val repository = WidgetStateRepository(context)
-            val handshakesJson by repository.handshakes.collectAsState(initial = runBlocking { repository.handshakes.first() })
-            val handshakes = Json.decodeFromString<List<Handshake>>(handshakesJson)
+            val handshakesJson by repository.handshakes.collectAsState(initial = "[]")
+            val handshakes = try {
+                Json.decodeFromString<List<Handshake>>(handshakesJson)
+            } catch (e: Exception) {
+                emptyList()
+            }
 
             Content(handshakes = handshakes)
         }
