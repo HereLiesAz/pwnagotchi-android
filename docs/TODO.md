@@ -35,8 +35,8 @@ The Kotlin Gradle Plugin (KGP) version 2.2.20 is compatible with Gradle versions
 
 ### Section 2.1: Implementing AzNavRail and NavHost
 - [ ] **Define Navigation Graph:** Create a `Screen.kt` sealed class to define all navigation routes, titles, and icons.
-3.  **Refactor Screens to be Stateless:** Modify each screen composable to accept a `NavController` instance or specific navigation lambda functions as parameters.
-4.  **Implement AzNavRail:** Overhaul `MainActivity.kt` to use the `AzNavRail` composable to manage screen transitions and the navigation rail, completely removing the previous `when` block based on boolean flags.
+- [ ] **Refactor Screens to be Stateless:** Modify each screen composable to accept a `NavController` instance or specific navigation lambda functions as parameters.
+- [ ] **Implement AzNavRail:** Overhaul `MainActivity.kt` to use the `AzNavRail` composable to manage screen transitions and the navigation rail, completely removing the previous `when` block based on boolean flags.
 
 ## Phase 2: Core Functionality Implementation and Security Hardening
 
