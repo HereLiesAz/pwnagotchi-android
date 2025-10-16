@@ -14,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.pwnagotchi.pwnagotchiandroid.core.Constants
-import com.pwnagotchi.pwnagotchiandroid.ui.MainScreen
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
 
 class MainActivity : ComponentActivity() {
@@ -47,7 +46,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(
+                    NavGraph(
                         mainViewModel = pwnagotchiViewModel,
                         onTogglePlugin = { pluginName, enabled ->
                             pwnagotchiService?.togglePlugin(pluginName, enabled)

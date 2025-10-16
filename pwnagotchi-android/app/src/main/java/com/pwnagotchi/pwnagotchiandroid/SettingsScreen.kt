@@ -29,22 +29,15 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    uiState: PwnagotchiUiState,
-    onSave: (String) -> Unit
+    onSave: (String) -> Unit,
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val sharedPreferences = remember {
         context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
     }
     var host by remember {
-        mutableStateOf(
-            when (uiState) {
-                is PwnagotchiUiState.Connected -> uiState.host
-                is PwnagotchiUiState.Connecting -> uiState.host
-                is PwnagotchiUiState.Disconnected -> sharedPreferences.getString("host", Constants.DEFAULT_PWNAGOTCHI_IP) ?: Constants.DEFAULT_PWNAGOTCHI_IP
-                is PwnagotchiUiState.Error -> sharedPreferences.getString("host", Constants.DEFAULT_PWNAGOTCHI_IP) ?: Constants.DEFAULT_PWNAGOTCHI_IP
-            }
-        )
+        mutableStateOf(sharedPreferences.getString("host", Constants.DEFAULT_PWNAGOTCHI_IP) ?: Constants.DEFAULT_PWNAGOTCHI_IP)
     }
     var theme by remember {
         mutableStateOf(sharedPreferences.getString("theme", "System") ?: "System")
@@ -96,8 +89,12 @@ fun SettingsScreen(
                 .putString("opwngrid_api_key", apiKey)
                 .apply()
             onSave(host)
+            onBack()
         }) {
             Text(stringResource(id = R.string.save))
+        }
+        Button(onClick = onBack) {
+            Text(stringResource(id = R.string.back))
         }
     }
 }

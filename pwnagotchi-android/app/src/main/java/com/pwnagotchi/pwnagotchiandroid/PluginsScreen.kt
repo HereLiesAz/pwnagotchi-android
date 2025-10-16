@@ -20,9 +20,11 @@ import androidx.compose.ui.res.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PluginsScreen(
-    uiState: PwnagotchiUiState,
+    installedPlugins: List<Plugin>,
+    communityPlugins: List<CommunityPlugin>,
     onTogglePlugin: (String, Boolean) -> Unit,
-    onInstallPlugin: (String) -> Unit
+    onInstallPlugin: (String) -> Unit,
+    onBack: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf(stringResource(id = R.string.installed), stringResource(id = R.string.discover))
@@ -30,7 +32,12 @@ fun PluginsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(id = R.string.plugins)) }
+                title = { Text(stringResource(id = R.string.plugins)) },
+                navigationIcon = {
+                    Button(onClick = onBack) {
+                        Text(stringResource(id = R.string.back))
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -44,11 +51,9 @@ fun PluginsScreen(
                     )
                 }
             }
-            if (uiState is PwnagotchiUiState.Connected) {
-                when (selectedTab) {
-                    0 -> InstalledPluginsScreen(plugins = uiState.plugins, onTogglePlugin = onTogglePlugin)
-                    1 -> DiscoverPluginsScreen(plugins = uiState.communityPlugins, onInstallPlugin = onInstallPlugin)
-                }
+            when (selectedTab) {
+                0 -> InstalledPluginsScreen(plugins = installedPlugins, onTogglePlugin = onTogglePlugin)
+                1 -> DiscoverPluginsScreen(plugins = communityPlugins, onInstallPlugin = onInstallPlugin)
             }
         }
     }
