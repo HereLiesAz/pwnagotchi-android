@@ -66,12 +66,23 @@ class PwnagotchiService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", getString(R.string.notification_service_running))
-        startForeground(1, notification)
-        val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-        val host = sharedPreferences.getString("host", null)
-        if (host != null) {
-            connect(URI("wss://$host:8765"))
+        when (intent?.action) {
+            "com.pwnagotchi.pwnagotchiandroid.RECONNECT" -> {
+                val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+                val host = sharedPreferences.getString("host", null)
+                if (host != null) {
+                    connect(URI("wss://$host:8765"))
+                }
+            }
+            else -> {
+                val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", getString(R.string.notification_service_running))
+                startForeground(1, notification)
+                val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+                val host = sharedPreferences.getString("host", null)
+                if (host != null) {
+                    connect(URI("wss://$host:8765"))
+                }
+            }
         }
         return START_STICKY
     }
@@ -180,6 +191,7 @@ class PwnagotchiService : Service() {
             val currentState = _uiState.value
             if (currentState is PwnagotchiUiState.Connected) {
                 _uiState.value = currentState.copy(leaderboard = leaderboard)
+                widgetStateRepository.updateLeaderboard(json.encodeToString(leaderboard))
             }
         }
     }
