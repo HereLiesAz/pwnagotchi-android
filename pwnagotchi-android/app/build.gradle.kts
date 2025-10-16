@@ -94,7 +94,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // AzNavRail
-    implementation("com.github.HereLiesAz:AzNavRail:3.13")
+    implementation("com.github.HereLiesAz:AzNavRail:1.0.2")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

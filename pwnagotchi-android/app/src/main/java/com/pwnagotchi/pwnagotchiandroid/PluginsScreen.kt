@@ -2,7 +2,6 @@ package com.pwnagotchi.pwnagotchiandroid
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
@@ -10,21 +9,22 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.pwnagotchi.pwnagotchiandroid.viewmodels.PluginsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PluginsScreen(
-    plugins: List<Plugin>,
-    communityPlugins: List<CommunityPlugin>,
-    onTogglePlugin: (String, Boolean) -> Unit,
-    onInstallPlugin: (String) -> Unit
+    viewModel: PluginsViewModel
 ) {
+    val plugins by viewModel.plugins.collectAsState()
+    val communityPlugins by viewModel.communityPlugins.collectAsState()
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf(stringResource(id = R.string.installed), stringResource(id = R.string.discover))
 
@@ -46,8 +46,8 @@ fun PluginsScreen(
                 }
             }
             when (selectedTab) {
-                0 -> InstalledPluginsScreen(plugins = plugins, onTogglePlugin = onTogglePlugin)
-                1 -> DiscoverPluginsScreen(plugins = communityPlugins, onInstallPlugin = onInstallPlugin)
+                0 -> InstalledPluginsScreen(plugins = plugins, onTogglePlugin = viewModel::togglePlugin)
+                1 -> DiscoverPluginsScreen(plugins = communityPlugins, onInstallPlugin = viewModel::installCommunityPlugin)
             }
         }
     }

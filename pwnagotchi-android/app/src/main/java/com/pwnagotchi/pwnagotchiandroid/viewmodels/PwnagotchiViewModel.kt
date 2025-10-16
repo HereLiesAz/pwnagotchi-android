@@ -1,19 +1,16 @@
-package com.pwnagotchi.pwnagotchiandroid
+package com.pwnagotchi.pwnagotchiandroid.viewmodels
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import com.pwnagotchi.pwnagotchiandroid.PwnagotchiService
+import com.pwnagotchi.pwnagotchiandroid.PwnagotchiUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
-class PwnagotchiViewModel : ViewModel() {
+class PwnagotchiViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow<PwnagotchiUiState>(PwnagotchiUiState.Disconnected("Not connected"))
     val uiState: StateFlow<PwnagotchiUiState> = _uiState
     private var pwnagotchiService: PwnagotchiService? = null
-
-    private val _appMode = MutableStateFlow(AppMode.REMOTE)
-    val appMode: StateFlow<AppMode> = _appMode
 
     fun setService(service: PwnagotchiService?) {
         pwnagotchiService = service
@@ -24,16 +21,7 @@ class PwnagotchiViewModel : ViewModel() {
         }
     }
 
-    fun onModeChange(newMode: AppMode) {
-        _appMode.value = newMode
-        pwnagotchiService?.setMode(newMode)
-    }
-
-    fun startLocalAgent() {
-        pwnagotchiService?.startLocalAgent()
-    }
-
-    fun stopLocalAgent() {
+    fun disconnect() {
         pwnagotchiService?.disconnect()
     }
 }
