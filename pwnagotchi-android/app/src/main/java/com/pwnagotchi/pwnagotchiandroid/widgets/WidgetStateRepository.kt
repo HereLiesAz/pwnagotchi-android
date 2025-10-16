@@ -6,55 +6,54 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "widget_state")
 
 class WidgetStateRepository(private val context: Context) {
-    private object PreferencesKeys {
-        val FACE = stringPreferencesKey("face")
-        val MESSAGE = stringPreferencesKey("message")
-        val HANDSHAKES = stringPreferencesKey("handshakes")
-        val LEADERBOARD = stringPreferencesKey("leaderboard")
+    private val faceKey = stringPreferencesKey("face")
+    private val messageKey = stringPreferencesKey("message")
+    private val handshakesKey = stringPreferencesKey("handshakes")
+    private val leaderboardKey = stringPreferencesKey("leaderboard")
+
+    val face: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[faceKey] ?: "(·•᷄_•᷅ ·)"
     }
 
-    val widgetState = context.dataStore.data.map { preferences ->
-        WidgetState(
-            face = preferences[PreferencesKeys.FACE] ?: "(·•᷄_•᷅ ·)",
-            message = preferences[PreferencesKeys.MESSAGE] ?: "Not connected",
-            handshakes = preferences[PreferencesKeys.HANDSHAKES] ?: "[]",
-            leaderboard = preferences[PreferencesKeys.LEADERBOARD] ?: "[]"
-        )
+    val message: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[messageKey] ?: "Not connected"
     }
 
-    suspend fun updateFace(face: String) {
+    val handshakes: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[handshakesKey] ?: "[]"
+    }
+
+    val leaderboard: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[leaderboardKey] ?: "[]"
+    }
+
+    suspend fun updateFace(newFace: String) {
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.FACE] = face
+            preferences[faceKey] = newFace
         }
     }
 
-    suspend fun updateMessage(message: String) {
+    suspend fun updateMessage(newMessage: String) {
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.MESSAGE] = message
+            preferences[messageKey] = newMessage
         }
     }
 
-    suspend fun updateHandshakes(handshakes: String) {
+    suspend fun updateHandshakes(newHandshakes: String) {
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.HANDSHAKES] = handshakes
+            preferences[handshakesKey] = newHandshakes
         }
     }
 
-    suspend fun updateLeaderboard(leaderboard: String) {
+    suspend fun updateLeaderboard(newLeaderboard: String) {
         context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.LEADERBOARD] = leaderboard
+            preferences[leaderboardKey] = newLeaderboard
         }
     }
 }
-
-data class WidgetState(
-    val face: String,
-    val message: String,
-    val handshakes: String,
-    val leaderboard: String
-)

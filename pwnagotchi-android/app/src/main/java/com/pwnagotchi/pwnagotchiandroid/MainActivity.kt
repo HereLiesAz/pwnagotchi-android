@@ -8,78 +8,60 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.pwnagotchi.pwnagotchiandroid.core.Constants
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pwnagotchi.pwnagotchiandroid.ui.MainScreen
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
 
 class MainActivity : ComponentActivity() {
-    private val pwnagotchiViewModel: PwnagotchiViewModel by viewModels()
     private var pwnagotchiService: PwnagotchiService? = null
-    private var isServiceBound = false
+    private var isBound = false
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as PwnagotchiService.LocalBinder
+            val binder = service as PwnagotchiService.PwnagotchiBinder
             pwnagotchiService = binder.getService()
-            isServiceBound = true
-            pwnagotchiViewModel.setService(pwnagotchiService)
+            isBound = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            isServiceBound = false
+            isBound = false
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val serviceIntent = Intent(this, PwnagotchiService::class.java)
-        startService(serviceIntent)
-        bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)
+        Intent(this, PwnagotchiService::class.java).also { intent ->
+            startService(intent)
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
 
         setContent {
+            val pwnagotchiViewModel: PwnagotchiViewModel = viewModel()
+            pwnagotchiService?.let {
+                pwnagotchiViewModel.setService(it)
+            }
+            val pwnagotchiUiState by pwnagotchiViewModel.uiState.collectAsState()
+
             PwnagotchiAndroidTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainScreen(
-                        mainViewModel = pwnagotchiViewModel,
-                        onTogglePlugin = { pluginName, enabled ->
-                            pwnagotchiService?.togglePlugin(pluginName, enabled)
-                        },
-                        onInstallPlugin = { pluginName ->
-                            pwnagotchiService?.installCommunityPlugin(pluginName)
-                        },
-                        onSaveSettings = { host ->
-                            val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-                            sharedPreferences.edit()
-                                .putString("host", host)
-                                .apply()
-                            pwnagotchiService?.disconnect()
-                            pwnagotchiService?.connect(java.net.URI("wss://$host:${Constants.WEBSOCKET_PORT}"))
-                        },
-                        onReconnect = {
-                            pwnagotchiService?.disconnect()
-                            val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-                            val host = sharedPreferences.getString("host", "127.0.0.1") ?: "127.0.0.1"
-                            pwnagotchiService?.connect(java.net.URI("wss://$host:${Constants.WEBSOCKET_PORT}"))
-                        }
-                    )
-                }
+                MainScreen(
+                    pwnagotchiUiState = pwnagotchiUiState,
+                    onConnect = { host -> pwnagotchiService?.connect(host) },
+                    onDisconnect = { pwnagotchiService?.disconnect() },
+                    onTogglePlugin = { plugin, enabled -> pwnagotchiService?.togglePlugin(plugin, enabled) },
+                    onInstallPlugin = { plugin -> pwnagotchiService?.installPlugin(plugin) },
+                    onSaveSettings = { host, _ -> pwnagotchiService?.reconnect(host) }
+                )
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (isServiceBound) {
+        if (isBound) {
             unbindService(connection)
-            isServiceBound = false
+            isBound = false
         }
     }
 }
