@@ -1,17 +1,28 @@
 package com.pwnagotchi.pwnagotchiandroid.ui
 
 import androidx.compose.runtime.Composable
-import com.pwnagotchi.pwnagotchiandroid.PwnagotchiViewModel
+import com.pwnagotchi.pwnagotchiandroid.PwnagotchiScreen
+import com.pwnagotchi.pwnagotchiandroid.PwnagotchiUiState
 
 @Composable
 fun HomeScreen(
-    mainViewModel: PwnagotchiViewModel,
-    onReconnect: () -> Unit
+    uiState: PwnagotchiUiState,
+    onConnect: (String) -> Unit,
+    onDisconnect: () -> Unit,
+    onNavigateToPlugins: () -> Unit,
+    onNavigateToOpwngrid: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
-    // This will eventually hold the content of the home screen.
-    // For now, it will just display the main UI.
-    PwnagotchiScreen(
-        uiState = mainViewModel.uiState.value,
-        onReconnect = onReconnect
-    )
+    when (uiState) {
+        is PwnagotchiUiState.Connected -> PwnagotchiScreen(
+            uiState = uiState,
+            onDisconnect = onDisconnect,
+            onNavigateToPlugins = onNavigateToPlugins,
+            onNavigateToOpwngrid = onNavigateToOpwngrid,
+            onNavigateToSettings = onNavigateToSettings
+        )
+        is PwnagotchiUiState.Connecting -> ConnectingScreen(uiState.status)
+        is PwnagotchiUiState.Disconnected -> DisconnectedScreen(onConnect)
+        is PwnagotchiUiState.Error -> ErrorScreen(uiState.message, onConnect)
+    }
 }
