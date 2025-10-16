@@ -43,6 +43,7 @@ class PwnagotchiService : Service() {
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private var isNetworkAvailable = false
     private lateinit var opwngridClient: OpwngridClient
+    private lateinit var widgetStateRepository: com.pwnagotchi.pwnagotchiandroid.widgets.WidgetStateRepository
 
     inner class LocalBinder : Binder() {
         fun getService(): PwnagotchiService = this@PwnagotchiService
@@ -51,6 +52,7 @@ class PwnagotchiService : Service() {
     override fun onCreate() {
         super.onCreate()
         opwngridClient = OpwngridClient(this)
+        widgetStateRepository = com.pwnagotchi.pwnagotchiandroid.widgets.WidgetStateRepository(this)
         connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         networkCallback = createNetworkCallback()
         val networkRequest = NetworkRequest.Builder()
@@ -64,12 +66,23 @@ class PwnagotchiService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", getString(R.string.notification_service_running))
-        startForeground(1, notification)
-        val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-        val host = sharedPreferences.getString("host", null)
-        if (host != null) {
-            connect(URI("wss://$host:8765"))
+        when (intent?.action) {
+            "com.pwnagotchi.pwnagotchiandroid.RECONNECT" -> {
+                val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+                val host = sharedPreferences.getString("host", null)
+                if (host != null) {
+                    connect(URI("wss://$host:8765"))
+                }
+            }
+            else -> {
+                val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", getString(R.string.notification_service_running))
+                startForeground(1, notification)
+                val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+                val host = sharedPreferences.getString("host", null)
+                if (host != null) {
+                    connect(URI("wss://$host:8765"))
+                }
+            }
         }
         return START_STICKY
     }
@@ -101,6 +114,10 @@ class PwnagotchiService : Service() {
                                 val notificationText = "CH: ${data.channel} | APS: ${data.aps} | UP: ${data.uptime} | PWND: ${data.shakes} | MODE: ${data.mode}"
                                 _uiState.value = PwnagotchiUiState.Connected(notificationText, handshakes, plugins, face, emptyList(), communityPlugins)
                                 updateNotification(notificationText)
+                                serviceScope.launch {
+                                    widgetStateRepository.updateFace(face)
+                                    widgetStateRepository.updateMessage(notificationText)
+                                }
                             }
                             "handshake" -> {
                                 val handshakeMsg = json.decodeFromString<HandshakeMessage>(message)
@@ -113,6 +130,9 @@ class PwnagotchiService : Service() {
                                 handshakes.add(handshake)
                                 _uiState.value = PwnagotchiUiState.Connected(getString(R.string.status_new_handshake), handshakes, plugins, face, emptyList(), communityPlugins)
                                 showHandshakeNotification(handshake)
+                                serviceScope.launch {
+                                    widgetStateRepository.updateHandshakes(json.encodeToString(handshakes))
+                                }
                             }
                             "plugin_list" -> {
                                 val pluginListMsg = json.decodeFromString<PluginListMessage>(message)
@@ -171,6 +191,7 @@ class PwnagotchiService : Service() {
             val currentState = _uiState.value
             if (currentState is PwnagotchiUiState.Connected) {
                 _uiState.value = currentState.copy(leaderboard = leaderboard)
+                widgetStateRepository.updateLeaderboard(json.encodeToString(leaderboard))
             }
         }
     }
