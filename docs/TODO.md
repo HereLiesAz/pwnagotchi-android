@@ -5,7 +5,7 @@ This document outlines the engineering tasks required to transition the Pwnagotc
 ## Phase 1: Foundational Upgrade & Architectural Refactoring
 
 ### Section 1.1: Build Environment and Dependency Modernization
-- [ ] **Upgrade Gradle Wrapper:** Modify `gradle-wrapper.properties` to use Gradle version 8.14.
+- [x] **Upgrade Gradle Wrapper:** Modify `gradle-wrapper.properties` to use Gradle version 8.14. *(Note: This was already completed in the baseline source.)*
 - [ ] **Update Android Gradle Plugin (AGP):** Set AGP to version `8.14.0` in the root `build.gradle.kts`.
 - [ ] **Dependency Overhaul:**
     - [ ] Update all existing libraries in `app/build.gradle.kts` to their specified modern versions.
