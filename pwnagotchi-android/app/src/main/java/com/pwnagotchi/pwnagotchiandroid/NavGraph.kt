@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.Text
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,13 +15,13 @@ fun NavGraph(
     mainViewModel: PwnagotchiViewModel,
     onTogglePlugin: (String, Boolean) -> Unit,
     onInstallPlugin: (String) -> Unit,
-    onSaveSettings: (String, String) -> Unit,
+    onSaveSettings: (String) -> Unit,
     onReconnect: () -> Unit
 ) {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-    val ipAddress = sharedPreferences.getString("ip_address", null)
-    val startDestination = if (ipAddress == null) Screen.Settings.route else Screen.Home.route
+    val host = sharedPreferences.getString("host", null)
+    val startDestination = if (host == null) Screen.Settings.route else Screen.Home.route
 
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
@@ -65,7 +66,8 @@ fun NavGraph(
             }
         }
         composable(Screen.Opwngrid.route) {
-            OpwngridScreen()
+            val opwngridViewModel: OpwngridViewModel = viewModel(factory = OpwngridViewModelFactory(context))
+            OpwngridScreen(viewModel = opwngridViewModel)
         }
     }
 }

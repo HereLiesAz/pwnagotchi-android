@@ -29,21 +29,21 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    onSave: (String, String) -> Unit,
+    onSave: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val sharedPreferences = remember {
         context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
     }
-    var ipAddress by remember {
-        mutableStateOf(sharedPreferences.getString("ip_address", Constants.DEFAULT_PWNAGOTCHI_IP) ?: Constants.DEFAULT_PWNAGOTCHI_IP)
-    }
     var host by remember {
         mutableStateOf(sharedPreferences.getString("host", Constants.DEFAULT_PWNAGOTCHI_IP) ?: Constants.DEFAULT_PWNAGOTCHI_IP)
     }
     var theme by remember {
         mutableStateOf(sharedPreferences.getString("theme", "System") ?: "System")
+    }
+    var apiKey by remember {
+        mutableStateOf(sharedPreferences.getString("opwngrid_api_key", "") ?: "")
     }
 
     Column(
@@ -53,16 +53,16 @@ fun SettingsScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = ipAddress,
-            onValueChange = { ipAddress = it },
-            label = { Text(stringResource(id = R.string.pwnagotchi_ip)) },
+            value = host,
+            onValueChange = { host = it },
+            label = { Text(stringResource(id = R.string.websocket_host)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
-            value = host,
-            onValueChange = { host = it },
-            label = { Text(stringResource(id = R.string.websocket_host)) },
+            value = apiKey,
+            onValueChange = { apiKey = it },
+            label = { Text(stringResource(id = R.string.opwngrid_api_key)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -84,11 +84,11 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
             sharedPreferences.edit()
-                .putString("ip_address", ipAddress)
                 .putString("host", host)
                 .putString("theme", theme)
+                .putString("opwngrid_api_key", apiKey)
                 .apply()
-            onSave(ipAddress, host)
+            onSave(host)
             onBack()
         }) {
             Text(stringResource(id = R.string.save))
