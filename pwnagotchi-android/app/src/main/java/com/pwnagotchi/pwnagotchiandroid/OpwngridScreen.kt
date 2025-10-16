@@ -10,19 +10,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun OpwngridScreen(
-    uiState: OpwngridUiState
+    viewModel: OpwngridViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        when (uiState) {
+        when (val state = uiState) {
             is OpwngridUiState.Loading -> {
                 CircularProgressIndicator()
             }
@@ -33,13 +37,13 @@ fun OpwngridScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(uiState.leaderboard) { entry ->
+                    items(state.leaderboard) { entry ->
                         LeaderboardItem(entry = entry)
                     }
                 }
             }
             is OpwngridUiState.Error -> {
-                Text(text = "Error: ${uiState.message}")
+                Text(text = "Error: ${state.message}")
             }
         }
     }
