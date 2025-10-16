@@ -1,10 +1,31 @@
-# Add project specific ProGuard rules here.
-# By default, the Kotlin metadata is kept by the ProGuard rules that ship with AGP.
-# You can refer to the following link for more details:
-# https://developer.android.com/studio/build/shrink-code
+# Kotlin
+-dontwarn kotlin.**
 
-# Keep all @Serializable classes and their serializers
--keepclasseswithmembers public class * {
-    @kotlinx.serialization.Serializable <methods>;
+# Kotlinx Serialization
+-keepclassmembers class kotlinx.serialization.internal.* {
+    *;
 }
--keep class **$$serializer { *; }
+-keep class kotlinx.serialization.internal.* {
+    *;
+}
+-keepclassmembers class **.serializer {
+    *;
+}
+
+# Ktor
+-keep class io.ktor.** { *; }
+-dontwarn io.ktor.**
+-dontwarn org.slf4j.**
+
+# libsu
+-keep class com.topjohnwu.superuser.** { *; }
+
+# Jetpack Compose
+-keep class androidx.compose.** { *; }
+-keepclassmembers class androidx.compose.** { *; }
+-dontwarn androidx.compose.**
+
+# Jetpack Glance
+-keep class androidx.glance.** { *; }
+-keepclassmembers class androidx.glance.** { *; }
+-dontwarn androidx.glance.**
