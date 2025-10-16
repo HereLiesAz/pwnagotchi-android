@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pwnagotchi.pwnagotchiandroid.PwnagotchiUiState
-import com.pwnagotchi.pwnagotchiandroid.ui.navigation.Screen
+import com.pwnagotchi.pwnagotchiandroid.Screen
 
 @Composable
 fun MainScreen(
@@ -23,7 +23,7 @@ fun MainScreen(
     onDisconnect: () -> Unit,
     onTogglePlugin: (String, Boolean) -> Unit,
     onInstallPlugin: (String) -> Unit,
-    onSaveSettings: (String, String) -> Unit
+    onSaveSettings: (String, String, String) -> Unit
 ) {
     val navController = rememberNavController()
     val items = listOf(
