@@ -6,13 +6,13 @@ plugins {
 }
 
 android {
-    namespace = "com.pwnagotchi.pwnagotchiandroid"
+    namespace = "com.hereliesaz.pwnagotchiOnAndroid"
   compileSdk = 36
 
   defaultConfig {
-        applicationId = "com.pwnagotchi.pwnagotchiandroid"
+        applicationId = "com.hereliesaz.pwnagotchiOnAndroid"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 2
         versionName = "1.1"
 
@@ -57,12 +57,12 @@ android {
 
 dependencies {
     // Core & Lifecycle
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
-    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
+    implementation("androidx.activity:activity-compose:1.11.0")
 
     // Compose BOM
-    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    implementation(platform("androidx.compose:compose-bom:2025.10.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -70,7 +70,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // Material Components (Legacy)
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
 
     // Networking - Ktor & WebSocket
     implementation("io.ktor:ktor-client-core:3.3.1")
@@ -84,23 +84,23 @@ dependencies {
     implementation("com.github.topjohnwu.libsu:service:6.0.0")
 
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.navigation:navigation-compose:2.9.5")
 
     // Glance (Widgets)
     implementation("androidx.glance:glance-appwidget:1.1.1")
     implementation("androidx.glance:glance-material3:1.1.1")
 
     // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
 
     // AzNavRail
-    implementation("com.github.HereLiesAz:AzNavRail:1.0.2")
+    implementation("com.github.HereLiesAz:AzNavRail:3.13")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2025.10.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
