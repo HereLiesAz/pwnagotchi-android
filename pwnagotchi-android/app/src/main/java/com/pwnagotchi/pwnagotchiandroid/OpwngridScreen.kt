@@ -51,7 +51,7 @@ fun OpwngridScreen(viewModel: OpwngridViewModel) {
 fun LeaderboardItem(entry: LeaderboardEntry) {
     Column {
         Text(text = "Rank: ${entry.rank}")
-        Text(text = "Username: ${entry.username}")
-        Text(text = "Pwned: ${entry.pwned}")
+        Text(text = "Username: ${entry.name}")
+        Text(text = "Pwned: ${entry.handshakes}")
     }
 }

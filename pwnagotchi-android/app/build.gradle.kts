@@ -6,9 +6,9 @@ plugins {
 
 android {
     namespace = "com.pwnagotchi.pwnagotchiandroid"
-    compileSdk = 35
+  compileSdk = 36
 
-    defaultConfig {
+  defaultConfig {
         applicationId = "com.pwnagotchi.pwnagotchiandroid"
         minSdk = 24
         targetSdk = 35
