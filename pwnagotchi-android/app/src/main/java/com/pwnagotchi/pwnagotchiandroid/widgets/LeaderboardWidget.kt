@@ -10,8 +10,6 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.text.Text
 import androidx.glance.GlanceId
 import com.pwnagotchi.pwnagotchiandroid.LeaderboardEntry
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 class LeaderboardWidget : GlanceAppWidget() {
@@ -19,8 +17,12 @@ class LeaderboardWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             val repository = WidgetStateRepository(context)
-            val leaderboardJson by repository.leaderboard.collectAsState(initial = runBlocking { repository.leaderboard.first() })
-            val leaderboard = Json.decodeFromString<List<LeaderboardEntry>>(leaderboardJson)
+            val leaderboardJson by repository.leaderboard.collectAsState(initial = "[]")
+            val leaderboard = try {
+                Json.decodeFromString<List<LeaderboardEntry>>(leaderboardJson)
+            } catch (e: Exception) {
+                emptyList()
+            }
 
             Content(leaderboard = leaderboard)
         }

@@ -31,11 +31,15 @@ import androidx.compose.ui.unit.dp
 fun SettingsScreen(
     host: String,
     apiKey: String,
-    onSave: (String, String) -> Unit
+    onSave: (String, String, String) -> Unit
 ) {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val savedTheme = sharedPreferences.getString("theme", "System") ?: "System"
+
     var hostState by remember { mutableStateOf(host) }
     var apiKeyState by remember { mutableStateOf(apiKey) }
-    var theme by remember { mutableStateOf("System") } // Add logic to load saved theme
+    var theme by remember { mutableStateOf(savedTheme) }
 
     Column(
         modifier = Modifier
@@ -73,7 +77,10 @@ fun SettingsScreen(
             Text(stringResource(id = R.string.select_custom_theme))
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { onSave(hostState, apiKeyState) }) {
+        Button(onClick = {
+            sharedPreferences.edit().putString("theme", theme).apply()
+            onSave(hostState, apiKeyState, theme)
+        }) {
             Text(stringResource(id = R.string.save))
         }
     }

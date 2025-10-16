@@ -2,7 +2,10 @@ package com.pwnagotchi.pwnagotchiandroid.ui
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,11 +22,11 @@ import com.pwnagotchi.pwnagotchiandroid.ui.navigation.Screen
 @Composable
 fun MainScreen(
     pwnagotchiUiState: PwnagotchiUiState,
-    onConnect: (String) -> Unit,
     onDisconnect: () -> Unit,
     onTogglePlugin: (String, Boolean) -> Unit,
     onInstallPlugin: (String) -> Unit,
-    onSaveSettings: (String, String) -> Unit
+    onSaveSettings: (String, String, String) -> Unit,
+    onReconnect: () -> Unit
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -58,11 +61,11 @@ fun MainScreen(
             composable(Screen.Home.route) {
                 HomeScreen(
                     pwnagotchiUiState,
-                    onConnect,
                     onDisconnect,
                     onNavigateToPlugins = { navController.navigate(Screen.Plugins.route) },
                     onNavigateToOpwngrid = { navController.navigate(Screen.Opwngrid.route) },
-                    onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                    onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                    onReconnect = onReconnect
                 )
             }
             composable(Screen.Plugins.route) { PluginsScreenNav(pwnagotchiUiState, onTogglePlugin, onInstallPlugin) }
