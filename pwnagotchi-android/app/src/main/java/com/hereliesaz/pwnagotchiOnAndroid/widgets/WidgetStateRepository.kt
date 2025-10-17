@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "widget_state")
 
 class WidgetStateRepository(private val context: Context) {
+
     private val faceKey = stringPreferencesKey("face")
     private val messageKey = stringPreferencesKey("message")
     private val handshakesKey = stringPreferencesKey("handshakes")
@@ -22,7 +23,7 @@ class WidgetStateRepository(private val context: Context) {
     }
 
     val message: Flow<String> = context.dataStore.data.map { preferences ->
-        preferences[messageKey] ?: "Awaiting updates..."
+        preferences[messageKey] ?: "Not connected"
     }
 
     val handshakes: Flow<String> = context.dataStore.data.map { preferences ->
@@ -33,27 +34,27 @@ class WidgetStateRepository(private val context: Context) {
         preferences[leaderboardKey] ?: "[]"
     }
 
-    suspend fun updateFace(newFace: String) {
-        context.dataStore.edit { settings ->
-            settings[faceKey] = newFace
+    suspend fun updateFace(face: String) {
+        context.dataStore.edit { preferences ->
+            preferences[faceKey] = face
         }
     }
 
-    suspend fun updateMessage(newMessage: String) {
-        context.dataStore.edit { settings ->
-            settings[messageKey] = newMessage
+    suspend fun updateMessage(message: String) {
+        context.dataStore.edit { preferences ->
+            preferences[messageKey] = message
         }
     }
 
-    suspend fun updateHandshakes(newHandshakes: String) {
-        context.dataStore.edit { settings ->
-            settings[handshakesKey] = newHandshakes
+    suspend fun updateHandshakes(handshakes: String) {
+        context.dataStore.edit { preferences ->
+            preferences[handshakesKey] = handshakes
         }
     }
 
-    suspend fun updateLeaderboard(newLeaderboard: String) {
-        context.dataStore.edit { settings ->
-            settings[leaderboardKey] = newLeaderboard
+    suspend fun updateLeaderboard(leaderboard: String) {
+        context.dataStore.edit { preferences ->
+            preferences[leaderboardKey] = leaderboard
         }
     }
 }
