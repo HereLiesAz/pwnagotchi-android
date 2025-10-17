@@ -4,7 +4,9 @@
     android:minHeight="110dp"
     android:updatePeriodMillis="86400000"
     android:initialLayout="@layout/widget_loading"
-    android:description="@string/leaderboard_widget_description"
+    android:description="@string/widget_leaderboard_description"
     android:previewImage="@drawable/pwnagotchi_neutral"
     android:resizeMode="horizontal|vertical"
-    android:widgetCategory="home_screen" />
+    android:widgetCategory="home_screen"
+    android:targetCellWidth="3"
+    android:targetCellHeight="2" />

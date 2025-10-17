@@ -18,7 +18,7 @@
         android:layout_toEndOf="@id/notification_face"
         android:layout_marginStart="8dp"
         android:orientation="vertical"
-        android.layout_centerVertical="true">
+        android:layout_centerVertical="true">
 
         <TextView
             android:id="@+id/notification_status"

@@ -71,10 +71,8 @@ class MainActivity : ComponentActivity() {
                             editor.putString("city", city)
                             editor.apply()
                         },
-                        onReconnect = {
-                            val host = sharedPreferences.getString("host", "10.0.0.2") ?: "10.0.0.2"
-                            pwnagotchiService?.connect(URI("wss://$host:8765"))
-                        }
+                        onReconnect = { pwnagotchiService?.reconnect() },
+                        onFetchLeaderboard = { pwnagotchiViewModel.fetchLeaderboard() }
                     )
                 }
             }
