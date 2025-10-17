@@ -3,7 +3,7 @@ package com.hereliesaz.pwnagotchiOnAndroid
 data class Plugin(val name: String, val enabled: Boolean)
 data class CommunityPlugin(val name: String, val description: String)
 data class Handshake(val ap: String, val sta: String, val filename: String)
-data class LeaderboardEntry(val rank: Int, val name: String, val handshakes: Int)
+data class LeaderboardEntry(val rank: Int, val name: String?, val handshakes: Int)
 
 sealed interface PwnagotchiUiState {
     data class Connected(
