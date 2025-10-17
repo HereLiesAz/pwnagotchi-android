@@ -3,9 +3,8 @@
     android:minWidth="180dp"
     android:minHeight="40dp"
     android:updatePeriodMillis="86400000"
-    android:previewImage="@android:drawable/ic_dialog_info"
-    android:initialLayout="@layout/pwnagotchi_widget"
+    android:initialLayout="@layout/widget_loading"
     android:description="@string/quick_actions_widget_description"
+    android:previewImage="@drawable/pwnagotchi_neutral"
     android:resizeMode="horizontal|vertical"
-    android:widgetCategory="home_screen">
-</appwidget-provider>
+    android:widgetCategory="home_screen" />

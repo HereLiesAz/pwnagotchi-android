@@ -22,7 +22,7 @@ class WidgetStateRepository(private val context: Context) {
     }
 
     val message: Flow<String> = context.dataStore.data.map { preferences ->
-        preferences[messageKey] ?: "Not connected"
+        preferences[messageKey] ?: "Awaiting updates..."
     }
 
     val handshakes: Flow<String> = context.dataStore.data.map { preferences ->
@@ -34,26 +34,26 @@ class WidgetStateRepository(private val context: Context) {
     }
 
     suspend fun updateFace(newFace: String) {
-        context.dataStore.edit { preferences ->
-            preferences[faceKey] = newFace
+        context.dataStore.edit { settings ->
+            settings[faceKey] = newFace
         }
     }
 
     suspend fun updateMessage(newMessage: String) {
-        context.dataStore.edit { preferences ->
-            preferences[messageKey] = newMessage
+        context.dataStore.edit { settings ->
+            settings[messageKey] = newMessage
         }
     }
 
     suspend fun updateHandshakes(newHandshakes: String) {
-        context.dataStore.edit { preferences ->
-            preferences[handshakesKey] = newHandshakes
+        context.dataStore.edit { settings ->
+            settings[handshakesKey] = newHandshakes
         }
     }
 
     suspend fun updateLeaderboard(newLeaderboard: String) {
-        context.dataStore.edit { preferences ->
-            preferences[leaderboardKey] = newLeaderboard
+        context.dataStore.edit { settings ->
+            settings[leaderboardKey] = newLeaderboard
         }
     }
 }

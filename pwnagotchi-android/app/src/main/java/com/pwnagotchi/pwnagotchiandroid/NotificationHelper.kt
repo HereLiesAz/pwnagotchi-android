@@ -5,17 +5,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import com.pwnagotchi.pwnagotchiandroid.R
 
 object NotificationHelper {
-
     fun createNotification(
         context: Context,
         channelId: String,
         channelName: String,
-        importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
-        remoteViews: RemoteViews
+        contentText: String,
+        importance: Int = NotificationManager.IMPORTANCE_DEFAULT
     ): Notification {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -30,9 +29,9 @@ object NotificationHelper {
         }
 
         return NotificationCompat.Builder(context, channelId)
+            .setContentTitle("Pwnagotchi")
+            .setContentText(contentText)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setCustomContentView(remoteViews)
             .build()
     }
 }
