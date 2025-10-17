@@ -9,6 +9,7 @@ import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         Intent(this, PwnagotchiService::class.java).also { intent ->
             startService(intent)
             bindService(intent, connection, BIND_AUTO_CREATE)
@@ -71,10 +73,7 @@ class MainActivity : ComponentActivity() {
                             editor.putString("city", city)
                             editor.apply()
                         },
-                        onReconnect = {
-                            val host = sharedPreferences.getString("host", "10.0.0.2") ?: "10.0.0.2"
-                            pwnagotchiService?.connect(URI("wss://$host:8765"))
-                        }
+                        onReconnect = { pwnagotchiService?.reconnect() }
                     )
                 }
             }
