@@ -73,7 +73,8 @@ class MainActivity : ComponentActivity() {
                             editor.putString("city", city)
                             editor.apply()
                         },
-                        onReconnect = { pwnagotchiService?.reconnect() }
+                        onReconnect = { pwnagotchiService?.reconnect() },
+                        onFetchLeaderboard = { pwnagotchiViewModel.fetchLeaderboard() }
                     )
                 }
             }

@@ -133,12 +133,12 @@ A guided, multi-page onboarding flow is essential to manage user expectations, e
 
 - [x] **Step 5.3.1: Design the Custom Notification Layout**
     - [x] Create `app/src/main/res/layout/notification_pwnagotchi.xml` with an `ImageView` and `TextViews` for the custom notification.
-- [ ] **Step 5.3.2: Integrate RemoteViews into PwnagotchiService**
-    - [ ] In `PwnagotchiService.kt`, refactor `onStartCommand` to create the initial notification.
-    - [ ] In the `onMessage` `ui_update` case, call `updateNotification` with the new data.
-    - [ ] Replace `createNotification` and `updateNotification` methods to use `RemoteViews`.
-    - [ ] Add a `createRemoteViews` helper method to populate the custom layout.
-    - [ ] Modify the `disconnect` method to update the notification to a disconnected state.
+- [x] **Step 5.3.2: Integrate RemoteViews into PwnagotchiService**
+    - [x] In `PwnagotchiService.kt`, refactor `onStartCommand` to create the initial notification.
+    - [x] In the `onMessage` `ui_update` case, call `updateNotification` with the new data.
+    - [x] Replace `createNotification` and `updateNotification` methods to use `RemoteViews`.
+    - [x] Add a `createRemoteViews` helper method to populate the custom layout.
+    - [x] Modify the `disconnect` method to update the notification to a disconnected state.
 
 ### IV. Enhancing Ambient UX Part 2: Home Screen Integration via Jetpack Glance Widgets
 
@@ -147,13 +147,13 @@ A guided, multi-page onboarding flow is essential to manage user expectations, e
     - [x] Create eight new widget files: `StatusWidget.kt` & `StatusWidgetReceiver.kt`, `HandshakeLogWidget.kt` & `HandshakeLogWidgetReceiver.kt`, `QuickActionsWidget.kt` & `QuickActionsWidgetReceiver.kt`, `LeaderboardWidget.kt` & `LeaderboardWidgetReceiver.kt`.
     - [x] Create four XML provider info files in `res/xml/`: `status_widget_info.xml`, `handshake_log_widget_info.xml`, `quick_actions_widget_info.xml`, `leaderboard_widget_info.xml`.
     - [x] Register the four new widget receivers in `AndroidManifest.xml`.
-- [ ] **Step 5.4.2: Architect the Widget Data Synchronization Mechanism**
-    - [ ] Create `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/widgets/WidgetStateRepository.kt` to define and manage a `PreferencesDataStore`.
-    - [ ] Modify `PwnagotchiService.kt` to write UI and handshake updates to the `WidgetStateRepository`.
-    - [ ] Add a new method to `PwnagotchiViewModel` to update leaderboard widgets.
-- [ ] **Step 5.4.3: Implement the Four Widgets**
-    - [ ] Implement the `StatusWidget.kt` and `StatusWidgetReceiver.kt` using Jetpack Glance to display status from the DataStore.
-    - [ ] Implement the `HandshakeLogWidget`, `QuickActionsWidget`, and `LeaderboardWidget` following a similar pattern.
+- [x] **Step 5.4.2: Architect the Widget Data Synchronization Mechanism**
+    - [x] Create `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/widgets/WidgetStateRepository.kt` to define and manage a `PreferencesDataStore`.
+    - [x] Modify `PwnagotchiService.kt` to write UI and handshake updates to the `WidgetStateRepository`.
+    - [x] Add a new method to `PwnagotchiViewModel` to update leaderboard widgets.
+- [x] **Step 5.4.3: Implement the Four Widgets**
+    - [x] Implement the `StatusWidget.kt` and `StatusWidgetReceiver.kt` using Jetpack Glance to display status from the DataStore.
+    - [x] Implement the `HandshakeLogWidget`, `QuickActionsWidget`, and `LeaderboardWidget` following a similar pattern.
 
 ### V. Finalizing for Production: Code Hardening and Optimization
 

@@ -29,6 +29,7 @@ fun MainScreen(
     onInstallPlugin: (String) -> Unit,
     onSaveSettings: (String, String, String) -> Unit,
     onReconnect: () -> Unit,
+    onFetchLeaderboard: () -> Unit,
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -48,6 +49,9 @@ fun MainScreen(
                     label = { Text(screen.route) },
                     selected = currentRoute == screen.route,
                     onClick = {
+                        if (screen.route == Screen.Opwngrid.route) {
+                            onFetchLeaderboard()
+                        }
                         navController.navigate(screen.route) {
                             // Pop up to the start destination of the graph to
                             // avoid building up a large stack of destinations
