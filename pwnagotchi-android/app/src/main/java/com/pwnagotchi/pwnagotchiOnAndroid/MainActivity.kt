@@ -1,7 +1,6 @@
-package com.pwnagotchi.pwnagotchiandroid
+package com.hereliesaz.pwnagotchiOnAndroid
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
@@ -11,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.pwnagotchi.pwnagotchiandroid.PwnagotchiService
 import com.pwnagotchi.pwnagotchiandroid.ui.MainScreen
 import com.pwnagotchi.pwnagotchiandroid.ui.theme.PwnagotchiAndroidTheme
 import java.net.URI
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Intent(this, PwnagotchiService::class.java).also { intent ->
             startService(intent)
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+            bindService(intent, connection, BIND_AUTO_CREATE)
         }
 
         setContent {
@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     onInstallPlugin = { plugin -> pwnagotchiService?.installCommunityPlugin(plugin) },
                     onSaveSettings = { host, _, _ -> pwnagotchiService?.connect(URI("wss://$host:8765")) },
                     onReconnect = {
-                        val sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE)
+                        val sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE)
                         val host = sharedPreferences.getString("host", "10.0.0.2") ?: "10.0.0.2"
                         pwnagotchiService?.connect(URI("wss://$host:8765"))
                     }

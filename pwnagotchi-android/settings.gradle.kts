@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PwnagotchiAndroid"
+rootProject.name = "pwnagotchiOnAndroid"
 include(":app")
