@@ -10,6 +10,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Binder
 import android.os.IBinder
+import android.widget.RemoteViews
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -115,7 +116,7 @@ class PwnagotchiService : Service() {
                                 val statusText = "CH: ${data.channel} | APS: ${data.aps} | UP: ${data.uptime}"
                                 val messageText = "PWND: ${data.shakes} | MODE: ${data.mode}"
                                 _uiState.value = PwnagotchiUiState.Connected(statusText, handshakes, plugins, face, emptyList(), communityPlugins)
-                                updateNotification(statusText, messageText, face)
+                                updateNotification(statusText)
                                 serviceScope.launch {
                                     widgetStateRepository.updateFace(face)
                                     widgetStateRepository.updateMessage(messageText)
@@ -189,7 +190,7 @@ class PwnagotchiService : Service() {
 
     fun fetchLeaderboard() {
         serviceScope.launch {
-            val leaderboard = opwngridClient.getLeaderboard().map { LeaderboardEntry(it.first, it.second) }
+            val leaderboard = opwngridClient.getLeaderboard().mapIndexed { index, (name, pwned) -> LeaderboardEntry(name, pwned, index + 1) }
             val currentState = _uiState.value
             if (currentState is PwnagotchiUiState.Connected) {
                 _uiState.value = currentState.copy(leaderboard = leaderboard)
@@ -285,8 +286,16 @@ class PwnagotchiService : Service() {
     private fun showHandshakeNotification(handshake: Handshake) {
         val contentText = getString(R.string.notification_handshake_captured, handshake.ap)
         val remoteViews = createRemoteViews(contentText, "New handshake!", face)
-        val notification = NotificationHelper.createNotification(this, "handshake_channel", "Handshake Notifications", remoteViews = remoteViews)
+        val notification = NotificationHelper.createNotification(this, "handshake_channel", "Handshake Notifications", contentText)
         val manager = getSystemService(NotificationManager::class.java)
         manager.notify(2, notification)
+    }
+
+    private fun createRemoteViews(contentText: String, title: String, face: String): RemoteViews {
+        val remoteViews = RemoteViews(packageName, R.layout.notification_custom)
+        remoteViews.setTextViewText(R.id.notification_title, title)
+        remoteViews.setTextViewText(R.id.notification_message, contentText)
+        remoteViews.setTextViewText(R.id.notification_face, face)
+        return remoteViews
     }
 }

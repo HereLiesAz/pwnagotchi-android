@@ -14,7 +14,7 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.Column
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
-import com.hereliesaz.pwnagotchiandroid.R
+import com.hereliesaz.pwnagotchiOnAndroid.R
 
 class StatusWidget : GlanceAppWidget() {
 

@@ -25,7 +25,7 @@ class OpwngridViewModel(private val opwngridClient: OpwngridClient) : ViewModel(
         viewModelScope.launch {
             _uiState.value = OpwngridUiState.Loading
             try {
-                val leaderboard = opwngridClient.getLeaderboard().map { (name, pwned) -> LeaderboardEntry(name, pwned) }
+                val leaderboard = opwngridClient.getLeaderboard().mapIndexed { index, (name, pwned) -> LeaderboardEntry(name, pwned, index + 1) }
                 _uiState.value = OpwngridUiState.Success(leaderboard)
             } catch (e: Exception) {
                 _uiState.value = OpwngridUiState.Error(e.message ?: "Unknown error")
