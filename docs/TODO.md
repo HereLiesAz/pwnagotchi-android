@@ -46,15 +46,15 @@ This document provides an exhaustive, step-by-step engineering guide for transit
 ### Section 3.3: Comprehensive Application Hardening
 - [x] **Enable R8 and Resource Shrinking:** R8 and resource shrinking are now enabled for release builds.
 - [x] **Populate proguard-rules.pro:** The ProGuard rules have been reviewed and updated to include rules for all dependencies.
-- [ ] **Secure Android Manifest:** Set `android:allowBackup="false"` in `AndroidManifest.xml`.
+- [x] **Secure Android Manifest:** Backups have been disabled in `AndroidManifest.xml`.
 
 ## Phase 4: User Experience Polish and Performance Optimization
 
 ### Section 4.1: Designing an Intuitive Onboarding Experience
-- [ ] **Add Pager Dependency:** Ensure the foundation library, which includes `HorizontalPager`, is up-to-date.
-- [ ] **Create Onboarding Screen and Data Model:** Define a new `OnboardingScreen.kt`.
-- [ ] **Implement Navigation and State Management:** Use `rememberPagerState` to track the current page.
-- [ ] **Integrate Permission Request:** Add a button to trigger the `POST_NOTIFICATIONS` runtime permission request.
+- [x] **Add Pager Dependency:** The Compose foundation library containing the pager is already included.
+- [x] **Create Onboarding Screen and Data Model:** The `OnboardingScreen.kt` has been created.
+- [x] **Implement Navigation and State Management:** The onboarding screen now uses a `HorizontalPager` to manage its pages.
+- [x] **Integrate Permission Request:** A page has been added to the onboarding flow to request the `POST_NOTIFICATIONS` permission.
 - [ ] **Integrate with Main Navigation:** Use `SharedPreferences` or `DataStore` to track onboarding completion.
 
 ### Section 4.2: Enhancing Ambient UX

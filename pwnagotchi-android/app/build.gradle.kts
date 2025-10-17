@@ -78,6 +78,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("com.github.topjohnwu.libsu:core:5.2.2")
     implementation("org.jsoup:jsoup:1.17.2")
+    implementation("com.google.accompanist:accompanist-permissions:0.32.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
