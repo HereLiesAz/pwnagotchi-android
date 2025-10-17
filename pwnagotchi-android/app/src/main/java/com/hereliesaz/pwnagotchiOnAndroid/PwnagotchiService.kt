@@ -33,7 +33,7 @@ class PwnagotchiService : Service() {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
     private var reconnectionJob: Job? = null
-    private var currentUri: URI? = null
+    var currentUri: URI? = null
     private val maxReconnectionAttempts = 5
     private val handshakes = mutableListOf<Handshake>()
     private val plugins = mutableListOf<Plugin>()
@@ -52,7 +52,7 @@ class PwnagotchiService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        opwngridClient = OpwngridClient(this)
+        opwngridClient = OpwngridClient()
         widgetStateRepository = com.hereliesaz.pwnagotchiOnAndroid.widgets.WidgetStateRepository(this)
         connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         networkCallback = createNetworkCallback()
@@ -189,7 +189,7 @@ class PwnagotchiService : Service() {
 
     fun fetchLeaderboard() {
         serviceScope.launch {
-            val leaderboard = opwngridClient.getLeaderboard()
+            val leaderboard = opwngridClient.getLeaderboard().map { LeaderboardEntry(it.first, it.second) }
             val currentState = _uiState.value
             if (currentState is PwnagotchiUiState.Connected) {
                 _uiState.value = currentState.copy(leaderboard = leaderboard)
@@ -284,7 +284,8 @@ class PwnagotchiService : Service() {
 
     private fun showHandshakeNotification(handshake: Handshake) {
         val contentText = getString(R.string.notification_handshake_captured, handshake.ap)
-        val notification = NotificationHelper.createNotification(this, "handshake_channel", "Handshake Notifications", contentText, NotificationManager.IMPORTANCE_HIGH)
+        val remoteViews = createRemoteViews(contentText, "New handshake!", face)
+        val notification = NotificationHelper.createNotification(this, "handshake_channel", "Handshake Notifications", remoteViews = remoteViews)
         val manager = getSystemService(NotificationManager::class.java)
         manager.notify(2, notification)
     }

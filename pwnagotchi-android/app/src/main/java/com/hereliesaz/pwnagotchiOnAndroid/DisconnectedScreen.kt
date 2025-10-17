@@ -10,13 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun DisconnectedScreen(status: String, onReconnect: () -> Unit) {
+fun DisconnectedScreen(message: String, onReconnect: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = status)
+        Text(text = message)
         Button(onClick = onReconnect) {
             Text("Reconnect")
         }

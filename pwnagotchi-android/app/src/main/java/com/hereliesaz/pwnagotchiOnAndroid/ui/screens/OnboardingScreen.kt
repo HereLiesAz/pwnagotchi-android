@@ -3,9 +3,11 @@ package com.hereliesaz.pwnagotchiOnAndroid.ui.screens
 import android.Manifest
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -13,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -68,17 +71,12 @@ fun OnboardingScreen(onOnboardingComplete: () -> Unit) {
             // Simple dot indicator
             Row {
                 for (i in 0 until pagerState.pageCount) {
-                    val color = if (pagerState.currentPage == i) androidx.compose.ui.graphics.Color.Black else androidx.compose.ui.graphics.Color.Gray
+                    val color = if (pagerState.currentPage == i) Color.Black else Color.Gray
                     Box(
                         modifier = Modifier
                             .size(10.dp)
                             .padding(2.dp)
-                            .let {
-                                if (pagerState.currentPage == i) it.then(
-                                    Modifier
-                                ) else it
-                            }
-                            .background(color, shape = androidx.compose.foundation.shape.CircleShape)
+                            .background(color, shape = CircleShape)
                     )
                 }
             }

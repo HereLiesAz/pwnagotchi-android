@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,8 +33,8 @@ fun OpwngridScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(uiState.leaderboard) { entry ->
-                        LeaderboardItem(entry = entry)
+                    itemsIndexed(uiState.leaderboard) { index, entry ->
+                        LeaderboardItem(entry = entry, rank = index + 1)
                     }
                 }
             }
@@ -46,9 +46,9 @@ fun OpwngridScreen(
 }
 
 @Composable
-fun LeaderboardItem(entry: LeaderboardEntry) {
+fun LeaderboardItem(entry: LeaderboardEntry, rank: Int) {
     Column {
-        Text(text = "Rank: ${entry.rank}")
+        Text(text = "Rank: $rank")
         Text(text = "Username: ${entry.name}")
         Text(text = "Pwned: ${entry.handshakes}")
     }

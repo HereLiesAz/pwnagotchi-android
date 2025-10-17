@@ -8,7 +8,7 @@ class OpwngridViewModelFactory(private val context: Context) : ViewModelProvider
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(OpwngridViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return OpwngridViewModel(OpwngridClient(context)) as T
+            return OpwngridViewModel(OpwngridClient()) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

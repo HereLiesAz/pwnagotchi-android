@@ -28,12 +28,12 @@ fun HomeScreen(
         }
         is PwnagotchiUiState.Disconnected -> {
             DisconnectedScreen(
-                status = pwnagotchiUiState.status,
+                message = pwnagotchiUiState.message,
                 onReconnect = onReconnect
             )
         }
         is PwnagotchiUiState.Connecting -> {
-            LoadingScreen(pwnagotchiUiState.status)
+            LoadingScreen(pwnagotchiUiState.message)
         }
         is PwnagotchiUiState.Error -> {
             ErrorScreen(

@@ -1,54 +1,30 @@
 package com.hereliesaz.pwnagotchiOnAndroid
 
-import android.content.Context
-import com.hereliesaz.pwnagotchiOnAndroid.core.Constants
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.android.Android
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
+import io.ktor.client.*
+import io.ktor.client.engine.android.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import org.jsoup.Jsoup
 
-class OpwngridClient(private val context: Context) {
-    private val client = HttpClient(Android) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-            })
-        }
-    }
+const val OPWNGRID_LEADERBOARD_URL = "https://opwngrid.xyz/leaderboard"
 
-    suspend fun getLeaderboard(): List<LeaderboardEntry> {
-        val sharedPreferences = context.getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-        val apiKey = sharedPreferences.getString("opwngrid_api_key", "") ?: ""
-        return try {
-            client.get(Constants.OPWNGRID_API_BASE_URL + "leaderboard") {
-                header("X-API-KEY", apiKey)
-            }.body()
-            val html: String = client.get(Constants.OPWNGRID_LEADERBOARD_URL).body()
-            val doc = Jsoup.parse(html)
-            val table = doc.select("table").first()
-            val rows = table?.select("tr")
+class OpwngridClient {
+    private val client = HttpClient(Android)
 
-            val leaderboard = mutableListOf<LeaderboardEntry>()
-            for (i in 1 until (rows?.size ?: )) { // Skip header row
-                val row = rows?.get(i)
-                val cols = row?.select("td")
-              cols?.size?.let {
-                if (it >= 3) {
-                  val rank = cols?.get(0)?.text()?.toIntOrNull() ?: 0
-                  val name = cols?.get(1)?.text()
-                  val handshakes = cols[2].text().toIntOrNull() ?: 0
-                  leaderboard.add(LeaderboardEntry(rank, name, handshakes))
-                }
-              }
+    suspend fun getLeaderboard(): List<Pair<String, Int>> {
+        val response: HttpResponse = client.get(OPWNGRID_LEADERBOARD_URL)
+        val html = response.bodyAsText()
+        val doc = Jsoup.parse(html)
+        val rows = doc.select("tr")
+        return rows.mapNotNull { row ->
+            val columns = row.select("td")
+            if (columns.size >= 2) {
+                val name = columns[0].text()
+                val pwned = columns[1].text().toIntOrNull() ?: 0
+                Pair(name, pwned)
+            } else {
+                null
             }
-            leaderboard
-        } catch (e: Exception) {
-            emptyList()
         }
     }
 }

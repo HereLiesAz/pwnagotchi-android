@@ -33,7 +33,7 @@ class LeaderboardWidget : GlanceAppWidget() {
         LazyColumn {
             items(leaderboard.size) { index ->
                 val entry = leaderboard[index]
-                Text(text = "${entry.rank}. ${entry.name} - ${entry.handshakes}")
+                Text(text = "${index + 1}. ${entry.name} - ${entry.handshakes}")
             }
         }
     }

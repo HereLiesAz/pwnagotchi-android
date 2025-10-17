@@ -14,19 +14,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.hereliesaz.pwnagotchiOnAndroid.PwnagotchiService
 import com.hereliesaz.pwnagotchiOnAndroid.ui.MainScreen
 import com.hereliesaz.pwnagotchiOnAndroid.ui.theme.PwnagotchiOnAndroidTheme
-import java.net.URI
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.hereliesaz.pwnagotchiOnAndroid.ui.screens.OnboardingScreen
+import androidx.core.content.edit
+import java.net.URI
 
 class MainActivity : ComponentActivity() {
     private var pwnagotchiService: PwnagotchiService? = null
     private var isBound = false
     private val pwnagotchiViewModel: PwnagotchiViewModel by viewModels()
+    private var pwnagotchiService: PwnagotchiService? = null
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
@@ -51,8 +49,32 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+            val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+            var showOnboarding by remember { mutableStateOf(!sharedPreferences.getBoolean("onboarding_complete", false)) }
             val pwnagotchiUiState by pwnagotchiViewModel.uiState.collectAsState()
 
+            PwnagotchiOnAndroidTheme {
+                if (showOnboarding) {
+                    OnboardingScreen {
+                        sharedPreferences.edit { putBoolean("onboarding_complete", true) }
+                        showOnboarding = false
+                    }
+                } else {
+                    MainScreen(
+                        pwnagotchiUiState = pwnagotchiUiState,
+                        onDisconnect = { pwnagotchiService?.disconnect() },
+                        onTogglePlugin = { plugin, enabled -> pwnagotchiService?.togglePlugin(plugin, enabled) },
+                        onInstallPlugin = { plugin -> pwnagotchiService?.installCommunityPlugin(plugin) },
+                        onSaveSettings = { host, apiKey, city ->
+                            val editor = sharedPreferences.edit()
+                            editor.putString("host", host)
+                            editor.putString("api_key", apiKey)
+                            editor.putString("city", city)
+                            editor.apply()
+                        },
+                        onReconnect = { pwnagotchiService?.connect(pwnagotchiService?.currentUri!!) }
+                    )
+                }
             PwnagotchiOnAndroidTheme {  }AndroidTheme {
                 MainScreen(
                     pwnagotchiUiState = pwnagotchiUiState,
