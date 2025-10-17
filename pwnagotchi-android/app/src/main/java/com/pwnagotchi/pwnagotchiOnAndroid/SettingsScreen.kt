@@ -1,5 +1,7 @@
-package com.pwnagotchi.pwnagotchiOnAndroid
+package com.pwnagotchi.pwnagotchiandroid
 
+import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,22 +15,31 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.pwnagotchi.pwnagotchiandroid.core.Constants
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.pwnagotchi.pwnagotchiOnAndroid.viewmodels.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel
+    host: String,
+    apiKey: String,
+    onSave: (String, String, String) -> Unit
 ) {
-    val host by viewModel.host.collectAsState()
-    val apiKey by viewModel.apiKey.collectAsState()
-    val theme by viewModel.theme.collectAsState()
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val savedTheme = sharedPreferences.getString("theme", "System") ?: "System"
+
+    var hostState by remember { mutableStateOf(host) }
+    var apiKeyState by remember { mutableStateOf(apiKey) }
+    var theme by remember { mutableStateOf(savedTheme) }
 
     Column(
         modifier = Modifier
@@ -37,26 +48,26 @@ fun SettingsScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = host,
-            onValueChange = { viewModel.onHostChanged(it) },
+            value = hostState,
+            onValueChange = { hostState = it },
             label = { Text(stringResource(id = R.string.websocket_host)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
-            value = apiKey,
-            onValueChange = { viewModel.onApiKeyChanged(it) },
+            value = apiKeyState,
+            onValueChange = { apiKeyState = it },
             label = { Text(stringResource(id = R.string.opwngrid_api_key)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(stringResource(id = R.string.theme), style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(selected = theme == "System", onClick = { viewModel.onThemeChanged("System") })
+            RadioButton(selected = theme == "System", onClick = { theme = "System" })
             Text(stringResource(id = R.string.system))
-            RadioButton(selected = theme == "Light", onClick = { viewModel.onThemeChanged("Light") })
+            RadioButton(selected = theme == "Light", onClick = { theme = "Light" })
             Text(stringResource(id = R.string.light))
-            RadioButton(selected = theme == "Dark", onClick = { viewModel.onThemeChanged("Dark") })
+            RadioButton(selected = theme == "Dark", onClick = { theme = "Dark" })
             Text(stringResource(id = R.string.dark))
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -67,7 +78,8 @@ fun SettingsScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            viewModel.saveSettings()
+            sharedPreferences.edit().putString("theme", theme).apply()
+            onSave(hostState, apiKeyState, theme)
         }) {
             Text(stringResource(id = R.string.save))
         }

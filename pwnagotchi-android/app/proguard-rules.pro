@@ -11,7 +11,7 @@
 }
 
 # Ktor
--keep class io.ktor.client.engine.android.** { *; }
+-keep class io.ktor.client.engine.cio.** { *; }
 -keep class io.ktor.client.plugins.websocket.** { *; }
 -keep class io.ktor.client.plugins.contentnegotiation.** { *; }
 -keep class io.ktor.serialization.kotlinx.json.** { *; }

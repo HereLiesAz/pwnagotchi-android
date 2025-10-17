@@ -11,9 +11,6 @@ class PwnagotchiViewModel : ViewModel() {
     val uiState: StateFlow<PwnagotchiUiState> = _uiState
     private var pwnagotchiService: PwnagotchiService? = null
 
-    private val _appMode = MutableStateFlow(AppMode.REMOTE)
-    val appMode: StateFlow<AppMode> = _appMode
-
     fun setService(service: PwnagotchiService?) {
         pwnagotchiService = service
         viewModelScope.launch {
@@ -21,18 +18,5 @@ class PwnagotchiViewModel : ViewModel() {
                 _uiState.value = it
             }
         }
-    }
-
-    fun onModeChange(newMode: AppMode) {
-        _appMode.value = newMode
-        pwnagotchiService?.setMode(newMode)
-    }
-
-    fun startLocalAgent() {
-        pwnagotchiService?.startLocalAgent()
-    }
-
-    fun stopLocalAgent() {
-        pwnagotchiService?.disconnect()
     }
 }
