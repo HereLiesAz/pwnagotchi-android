@@ -1,38 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:padding="8dp">
 
     <ImageView
         android:id="@+id/notification_face"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
+        android:layout_marginEnd="8dp"
         android:src="@drawable/pwnagotchi_neutral" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/notification_face"
-        android:layout_marginStart="8dp"
-        android:orientation="vertical"
-        android.layout_centerVertical="true">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/notification_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Status: Connecting..."
+            android:text="Pwnagotchi Status"
             android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
 
         <TextView
             android:id="@+id/notification_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Waiting for Pwnagotchi..."
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Info" />
+            android:text="Waiting for updates..."
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Line2" />
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

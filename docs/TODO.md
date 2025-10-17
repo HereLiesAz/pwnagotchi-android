@@ -55,10 +55,11 @@ This document provides an exhaustive, step-by-step engineering guide for transit
 - [x] **Create Onboarding Screen and Data Model:** The `OnboardingScreen.kt` has been created.
 - [x] **Implement Navigation and State Management:** The onboarding screen now uses a `HorizontalPager` to manage its pages.
 - [x] **Integrate Permission Request:** A page has been added to the onboarding flow to request the `POST_NOTIFICATIONS` permission.
-- [ ] **Integrate with Main Navigation:** Use `SharedPreferences` or `DataStore` to track onboarding completion.
+- [x] **Integrate with Main Navigation:** The app now uses `SharedPreferences` to show the onboarding flow only on the first launch.
 
 ### Section 4.2: Enhancing Ambient UX
-- [ ] **Implement Persistent E-Ink Notification:** Refactor the service's notification to use a custom `RemoteViews` layout.
+- [x] **Design Custom Notification Layout:** The `notification_pwnagotchi.xml` layout has been created.
+- [x] **Implement Persistent E-Ink Notification:** The service's notification has been refactored to use the custom `RemoteViews` layout.
 - [ ] **Implement Home Screen Widgets:**
     - [ ] Set up the core infrastructure for Jetpack Glance widgets.
     - [ ] Architect the `WidgetStateRepository` with `DataStore`.
