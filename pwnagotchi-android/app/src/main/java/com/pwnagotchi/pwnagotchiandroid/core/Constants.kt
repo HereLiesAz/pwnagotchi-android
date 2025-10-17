@@ -5,4 +5,5 @@ object Constants {
     const val WEBSOCKET_PORT = 8765
     // This is a placeholder and needs to be verified.
     const val OPWNGRID_API_BASE_URL = "https://opwngrid.xyz/api/"
+    const val OPWNGRID_LEADERBOARD_URL = "https://opwngrid.xyz/leaderboard"
 }
