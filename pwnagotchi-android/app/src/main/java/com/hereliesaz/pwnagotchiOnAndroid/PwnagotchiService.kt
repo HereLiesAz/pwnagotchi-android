@@ -137,7 +137,7 @@ class PwnagotchiService : Service() {
                                 _uiState.value = PwnagotchiUiState.Connected(getString(R.string.status_new_handshake), handshakes, plugins, face, emptyList(), communityPlugins)
                                 showHandshakeNotification(handshake)
                                 serviceScope.launch {
-                                    widgetStateRepository.updateHandshakes(Json.encodeToString(handshakes))
+                                    widgetStateRepository.updateHandshakes(json.encodeToString(handshakes))
                                 }
                             }
                             "plugin_list" -> {
@@ -189,6 +189,14 @@ class PwnagotchiService : Service() {
         webSocketClient?.close()
         _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_disconnected_by_user))
         updateCustomNotification(getString(R.string.status_disconnected_by_user), "User disconnected", "( ´•︵•` )")
+    }
+
+    fun reconnect() {
+        val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+        val host = sharedPreferences.getString("host", null)
+        if (host != null) {
+            connect(URI("wss://$host:8765"))
+        }
     }
 
     fun fetchLeaderboard() {
