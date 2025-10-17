@@ -19,4 +19,8 @@ class PwnagotchiViewModel : ViewModel() {
             }
         }
     }
+
+    fun fetchLeaderboard() {
+        pwnagotchiService?.fetchLeaderboard()
+    }
 }

@@ -13,11 +13,11 @@ object LocalAgentManager {
 
     suspend fun enableMonitorMode(): Boolean {
         // Method 1: Qualcomm con_mode (More reliable on some devices)
-        Shell.su("echo 4 > /sys/module/wlan/parameters/con_mode").exec()
+        Shell.cmd("echo 4 > /sys/module/wlan/parameters/con_mode").exec()
         if (verifyMonitorMode()) return true
 
         // Method 2: Standard iwconfig fallback
-        Shell.su(
+        Shell.cmd(
             "ip link set $WLAN_INTERFACE down",
             "iwconfig $WLAN_INTERFACE mode monitor",
             "ip link set $WLAN_INTERFACE up"
@@ -26,7 +26,7 @@ object LocalAgentManager {
     }
 
     suspend fun disableMonitorMode(): Boolean {
-        Shell.su(
+        Shell.cmd(
             "ip link set $WLAN_INTERFACE down",
             "iwconfig $WLAN_INTERFACE mode managed",
             "ip link set $WLAN_INTERFACE up"
@@ -35,7 +35,7 @@ object LocalAgentManager {
     }
 
     private suspend fun verifyMonitorMode(): Boolean {
-        val result = Shell.su("iwconfig $WLAN_INTERFACE").exec()
+        val result = Shell.cmd("iwconfig $WLAN_INTERFACE").exec()
         return result.out.any { it.contains("Mode:Monitor", ignoreCase = true) }
     }
 }
