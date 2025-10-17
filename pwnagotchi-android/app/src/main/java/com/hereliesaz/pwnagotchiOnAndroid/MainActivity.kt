@@ -9,6 +9,7 @@ import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,17 +24,22 @@ import androidx.compose.runtime.setValue
 import com.hereliesaz.pwnagotchiOnAndroid.ui.screens.OnboardingScreen
 
 class MainActivity : ComponentActivity() {
+    private var pwnagotchiService: PwnagotchiService? = null
+    private var isBound = false
     private val pwnagotchiViewModel: PwnagotchiViewModel by viewModels()
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as PwnagotchiService.LocalBinder
-            val pwnagotchiService = binder.getService()
-            pwnagotchiViewModel.setService(pwnagotchiService)
+            pwnagotchiService = binder.getService()
+            pwnagotchiService?.let {
+                pwnagotchiViewModel.setService(it)
+            }
+            isBound = true
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
-            pwnagotchiViewModel.setService(null)
+            isBound = false
         }
     }
 
@@ -45,8 +51,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
-            var showOnboarding by remember { mutableStateOf(!sharedPreferences.getBoolean("onboarding_complete", false)) }
+            val pwnagotchiUiState by pwnagotchiViewModel.uiState.collectAsState()
 
             PwnagotchiOnAndroidTheme {  }AndroidTheme {
                 MainScreen(
@@ -64,15 +69,16 @@ class MainActivity : ComponentActivity() {
                         sharedPreferences.edit().putBoolean("onboarding_complete", true).apply()
                         showOnboarding = false
                     }
-                } else {
-                    MainScreen(viewModel = pwnagotchiViewModel)
-                }
+                )
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        unbindService(connection)
+        if (isBound) {
+            unbindService(connection)
+            isBound = false
+        }
     }
 }
