@@ -4,7 +4,7 @@
 
 This document provides an exhaustive, step-by-step engineering guide for transitioning the Pwnagotchi Android application from its current prototype state to a production-ready release suitable for the Google Play Store. The directive focuses on four critical pillars: foundational modernization and architectural refactoring, core functionality implementation and security hardening, user experience refinement and performance optimization, and final release preparations.
 
-The execution plan is predicated on a mandatory build environment consisting of Android API 36, Android Gradle Plugin (AGP) 8.14.0, and Kotlin 2.2.20. The provided project source code serves as the baseline, and this guide systematically addresses its architectural deficiencies, incomplete features, security vulnerabilities, and outdated configurations. Each phase and its constituent steps are designed to be atomic and actionable, providing the necessary context, code modifications, and validation procedures to ensure a high-quality, secure, and performant final product.
+The execution plan is predicated on a mandatory build environment consisting of Android API 36, Android Gradle Plugin (AGP) 8.13.0, and Kotlin 2.2.20. The provided project source code serves as the baseline, and this guide systematically addresses its architectural deficiencies, incomplete features, security vulnerabilities, and outdated configurations. Each phase and its constituent steps are designed to be atomic and actionable, providing the necessary context, code modifications, and validation procedures to ensure a high-quality, secure, and performant final product.
 
 ## Phase 1: Foundational Modernization and Architectural Refactoring
 
@@ -12,9 +12,9 @@ The initial phase is critical for establishing a stable and modern foundation. I
 
 ### Section 1.1: Build Environment Upgrade and Dependency Modernization
 
-The first priority is to align the project's build environment with the specified modern toolchain. This ensures access to the latest features, security patches, and performance improvements, while also mitigating risks associated with outdated libraries. The target environment—AGP 8.14.0 and Kotlin 2.2.20—necessitates a corresponding upgrade of the Gradle build tool itself, as major AGP versions are tightly coupled with major Gradle versions.
+The target environment—AGP 8.13.0 and Kotlin 2.2.20—necessitates a corresponding upgrade of the Gradle build tool itself, as major AGP versions are tightly coupled with major Gradle versions.
 
-The Kotlin Gradle Plugin (KGP) version 2.2.20 is compatible with Gradle versions up to 8.14, making the specified configuration technically viable and stable. The following steps will bring the project into compliance.
+The Kotlin Gradle Plugin (KGP) version 2.2.20 is compatible with Gradle versions up to 8.13, making the specified configuration technically viable and stable. The following steps will bring the project into compliance.
 
 **Actionable Steps:**
 
@@ -112,7 +112,7 @@ A guided, multi-page onboarding flow is essential to manage user expectations, e
 - [x] **Step 5.1.1: Gradle Wrapper Upgrade to Version 8.14**
     - [x] Modify `gradle/wrapper/gradle-wrapper.properties` to set `distributionUrl` to `https\://services.gradle.org/distributions/gradle-8.14-bin.zip`.
 - [x] **Step 5.1.2: Android Gradle Plugin and Kotlin Plugin Update**
-    - [x] In the root `build.gradle.kts`, update the `com.android.application` plugin to version `8.14.0`.
+    - [x] In the root `build.gradle.kts`, update the `com.android.application` plugin to version `8.13.0`.
 - [x] **Step 5.1.3: Dependency Modernization and Addition**
     - [x] In `app/build.gradle.kts`, update core, Compose, Material, Ktor, and testing dependencies to the specified new versions.
     - [x] Add new dependencies for Jetpack Glance (`androidx.glance:glance-appwidget:1.1.1`, `androidx.glance:glance-material3:1.1.1`).
@@ -120,40 +120,40 @@ A guided, multi-page onboarding flow is essential to manage user expectations, e
 
 ### II. Architectural Refactoring: Implementing a Scalable Navigation Rail
 
-- [ ] **Step 5.2.1: Define Navigation Routes and Graph**
-    - [ ] Create `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/ui/navigation/AppNavigation.kt` with a `Screen` sealed class for navigation destinations.
-    - [ ] Add new string resources for screen titles (`screen_home`, `screen_opwngrid`) to `app/src/main/res/values/strings.xml`.
-- [ ] **Step 5.2.2: Refactor MainActivity with Scaffold, AzNavRail, and NavHost**
-    - [ ] Create `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/ui/MainScreen.kt` to house the main UI structure with `NavigationRail` and `NavHost`.
-    - [ ] Create new screen wrapper composables: `HomeScreen.kt`, `PluginsScreenNav.kt`, `OpwngridScreenNav.kt`, `SettingsScreenNav.kt`.
-    - [ ] Refactor `PluginsScreen.kt`, `OpwngridScreen.kt`, and `SettingsScreen.kt` to remove `onBack` callbacks.
-    - [ ] Completely replace the content of `MainActivity.kt` to use the new `MainScreen` composable and handle service binding.
+- [x] **Step 5.2.1: Define Navigation Routes and Graph**
+    - [x] Create `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/ui/navigation/AppNavigation.kt` with a `Screen` sealed class for navigation destinations.
+    - [x] Add new string resources for screen titles (`screen_home`, `screen_opwngrid`) to `app/src/main/res/values/strings.xml`.
+- [x] **Step 5.2.2: Refactor MainActivity with Scaffold, AzNavRail, and NavHost**
+    - [x] Create `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/ui/MainScreen.kt` to house the main UI structure with `NavigationRail` and `NavHost`.
+    - [x] Create new screen wrapper composables: `HomeScreen.kt`, `PluginsScreenNav.kt`, `OpwngridScreenNav.kt`, `SettingsScreenNav.kt`.
+    - [x] Refactor `PluginsScreen.kt`, `OpwngridScreen.kt`, and `SettingsScreen.kt` to remove `onBack` callbacks.
+    - [x] Completely replace the content of `MainActivity.kt` to use the new `MainScreen` composable and handle service binding.
 
 ### III. Enhancing Ambient UX Part 1: The Persistent E-Ink Display Notification
 
-- [ ] **Step 5.3.1: Design the Custom Notification Layout**
-    - [ ] Create `app/src/main/res/layout/notification_pwnagotchi.xml` with an `ImageView` and `TextViews` for the custom notification.
-- [ ] **Step 5.3.2: Integrate RemoteViews into PwnagotchiService**
-    - [ ] In `PwnagotchiService.kt`, refactor `onStartCommand` to create the initial notification.
-    - [ ] In the `onMessage` `ui_update` case, call `updateNotification` with the new data.
-    - [ ] Replace `createNotification` and `updateNotification` methods to use `RemoteViews`.
-    - [ ] Add a `createRemoteViews` helper method to populate the custom layout.
-    - [ ] Modify the `disconnect` method to update the notification to a disconnected state.
+- [x] **Step 5.3.1: Design the Custom Notification Layout**
+    - [x] Create `app/src/main/res/layout/notification_pwnagotchi.xml` with an `ImageView` and `TextViews` for the custom notification.
+- [x] **Step 5.3.2: Integrate RemoteViews into PwnagotchiService**
+    - [x] In `PwnagotchiService.kt`, refactor `onStartCommand` to create the initial notification.
+    - [x] In the `onMessage` `ui_update` case, call `updateNotification` with the new data.
+    - [x] Replace `createNotification` and `updateNotification` methods to use `RemoteViews`.
+    - [x] Add a `createRemoteViews` helper method to populate the custom layout.
+    - [x] Modify the `disconnect` method to update the notification to a disconnected state.
 
 ### IV. Enhancing Ambient UX Part 2: Home Screen Integration via Jetpack Glance Widgets
 
-- [ ] **Step 5.4.1: Core Widget Infrastructure Setup**
-    - [ ] Create a new package `com.pwnagotchi.pwnagotchiandroid.widgets`.
-    - [ ] Create eight new widget files: `StatusWidget.kt` & `StatusWidgetReceiver.kt`, `HandshakeLogWidget.kt` & `HandshakeLogWidgetReceiver.kt`, `QuickActionsWidget.kt` & `QuickActionsWidgetReceiver.kt`, `LeaderboardWidget.kt` & `LeaderboardWidgetReceiver.kt`.
-    - [ ] Create four XML provider info files in `res/xml/`: `status_widget_info.xml`, `handshake_log_widget_info.xml`, `quick_actions_widget_info.xml`, `leaderboard_widget_info.xml`.
-    - [ ] Register the four new widget receivers in `AndroidManifest.xml`.
-- [ ] **Step 5.4.2: Architect the Widget Data Synchronization Mechanism**
-    - [ ] Create `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/widgets/WidgetStateRepository.kt` to define and manage a `PreferencesDataStore`.
-    - [ ] Modify `PwnagotchiService.kt` to write UI and handshake updates to the `WidgetStateRepository`.
-    - [ ] Add a new method to `PwnagotchiViewModel` to update leaderboard widgets.
-- [ ] **Step 5.4.3: Implement the Four Widgets**
-    - [ ] Implement the `StatusWidget.kt` and `StatusWidgetReceiver.kt` using Jetpack Glance to display status from the DataStore.
-    - [ ] Implement the `HandshakeLogWidget`, `QuickActionsWidget`, and `LeaderboardWidget` following a similar pattern.
+- [x] **Step 5.4.1: Core Widget Infrastructure Setup**
+    - [x] Create a new package `com.pwnagotchi.pwnagotchiandroid.widgets`.
+    - [x] Create eight new widget files: `StatusWidget.kt` & `StatusWidgetReceiver.kt`, `HandshakeLogWidget.kt` & `HandshakeLogWidgetReceiver.kt`, `QuickActionsWidget.kt` & `QuickActionsWidgetReceiver.kt`, `LeaderboardWidget.kt` & `LeaderboardWidgetReceiver.kt`.
+    - [x] Create four XML provider info files in `res/xml/`: `status_widget_info.xml`, `handshake_log_widget_info.xml`, `quick_actions_widget_info.xml`, `leaderboard_widget_info.xml`.
+    - [x] Register the four new widget receivers in `AndroidManifest.xml`.
+- [x] **Step 5.4.2: Architect the Widget Data Synchronization Mechanism**
+    - [x] Create `app/src/main/java/com/pwnagotchi/pwnagotchiandroid/widgets/WidgetStateRepository.kt` to define and manage a `PreferencesDataStore`.
+    - [x] Modify `PwnagotchiService.kt` to write UI and handshake updates to the `WidgetStateRepository`.
+    - [x] Add a new method to `PwnagotchiViewModel` to update leaderboard widgets.
+- [x] **Step 5.4.3: Implement the Four Widgets**
+    - [x] Implement the `StatusWidget.kt` and `StatusWidgetReceiver.kt` using Jetpack Glance to display status from the DataStore.
+    - [x] Implement the `HandshakeLogWidget`, `QuickActionsWidget`, and `LeaderboardWidget` following a similar pattern.
 
 ### V. Finalizing for Production: Code Hardening and Optimization
 

@@ -1,5 +1,7 @@
 package com.hereliesaz.pwnagotchiOnAndroid
 
+import android.app.Notification
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
@@ -11,6 +13,7 @@ import android.net.NetworkRequest
 import android.os.Binder
 import android.os.IBinder
 import android.widget.RemoteViews
+import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -77,7 +80,7 @@ class PwnagotchiService : Service() {
                 }
             }
             else -> {
-                val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", getString(R.string.notification_service_running))
+                val notification = createCustomNotification(getString(R.string.status_connecting), "Waiting for Pwnagotchi...")
                 startForeground(1, notification)
                 val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
                 val host = sharedPreferences.getString("host", null)
@@ -99,7 +102,7 @@ class PwnagotchiService : Service() {
             webSocketClient = object : WebSocketClient(uri) {
                 override fun onOpen(handshakedata: ServerHandshake?) {
                     _uiState.value = PwnagotchiUiState.Connected(getString(R.string.status_connected), handshakes, plugins, face, emptyList(), communityPlugins)
-                    updateNotification(getString(R.string.status_connected_to_pwnagotchi))
+                    updateCustomNotification(getString(R.string.status_connected_to_pwnagotchi), "Ready to pwn!")
                     listPlugins()
                     getCommunityPlugins()
                 }
@@ -116,7 +119,7 @@ class PwnagotchiService : Service() {
                                 val statusText = "CH: ${data.channel} | APS: ${data.aps} | UP: ${data.uptime}"
                                 val messageText = "PWND: ${data.shakes} | MODE: ${data.mode}"
                                 _uiState.value = PwnagotchiUiState.Connected(statusText, handshakes, plugins, face, emptyList(), communityPlugins)
-                                updateNotification(statusText)
+                                updateCustomNotification(statusText, messageText, face)
                                 serviceScope.launch {
                                     widgetStateRepository.updateFace(face)
                                     widgetStateRepository.updateMessage(messageText)
@@ -134,7 +137,7 @@ class PwnagotchiService : Service() {
                                 _uiState.value = PwnagotchiUiState.Connected(getString(R.string.status_new_handshake), handshakes, plugins, face, emptyList(), communityPlugins)
                                 showHandshakeNotification(handshake)
                                 serviceScope.launch {
-                                    widgetStateRepository.updateHandshakes(Json.encodeToString(handshakes))
+                                    widgetStateRepository.updateHandshakes(json.encodeToString(handshakes))
                                 }
                             }
                             "plugin_list" -> {
@@ -158,7 +161,7 @@ class PwnagotchiService : Service() {
 
                 override fun onClose(code: Int, reason: String?, remote: Boolean) {
                     _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_connection_closed))
-                    updateNotification(getString(R.string.status_connection_closed))
+                    updateCustomNotification(getString(R.string.status_connection_closed), "Connection closed", "(⇀‿‿↼)")
                     if (isNetworkAvailable) {
                         scheduleReconnect()
                     }
@@ -185,7 +188,15 @@ class PwnagotchiService : Service() {
         reconnectionJob?.cancel()
         webSocketClient?.close()
         _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_disconnected_by_user))
-        updateNotification(getString(R.string.status_disconnected_by_user))
+        updateCustomNotification(getString(R.string.status_disconnected_by_user), "User disconnected", "( ´•︵•` )")
+    }
+
+    fun reconnect() {
+        val sharedPreferences = getSharedPreferences("pwnagotchi_prefs", Context.MODE_PRIVATE)
+        val host = sharedPreferences.getString("host", null)
+        if (host != null) {
+            connect(URI("wss://$host:8765"))
+        }
     }
 
     fun fetchLeaderboard() {
@@ -272,30 +283,55 @@ class PwnagotchiService : Service() {
                 isNetworkAvailable = false
                 reconnectionJob?.cancel()
                 _uiState.value = PwnagotchiUiState.Disconnected(getString(R.string.status_network_lost))
-                updateNotification(getString(R.string.notification_network_lost))
+                updateCustomNotification(getString(R.string.notification_network_lost), "Network lost", "(´•(oo)•`)")
             }
         }
     }
 
-    private fun updateNotification(contentText: String) {
-        val notification = NotificationHelper.createNotification(this, "pwnagotchi_service_channel", "Pwnagotchi Service Channel", contentText)
-        val manager = getSystemService(NotificationManager::class.java)
+    private fun getFaceDrawable(face: String): Int {
+        return when (face) {
+            "happy" -> R.drawable.pwnagotchi_happy
+            "sad" -> R.drawable.pwnagotchi_sad
+            else -> R.drawable.pwnagotchi_neutral
+        }
+    }
+
+    private fun createCustomNotification(status: String, message: String, face: String = "neutral"): Notification {
+        val remoteViews = RemoteViews(packageName, R.layout.notification_pwnagotchi).apply {
+            setImageViewResource(R.id.notification_face, getFaceDrawable(face))
+            setTextViewText(R.id.notification_status, status)
+            setTextViewText(R.id.notification_message, message)
+        }
+
+        val channelId = "pwnagotchi_service_channel"
+        val channelName = "Pwnagotchi Service Channel"
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channel = NotificationChannel(
+            channelId,
+            channelName,
+            NotificationManager.IMPORTANCE_LOW
+        )
+        notificationManager.createNotificationChannel(channel)
+
+
+        return NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setCustomContentView(remoteViews)
+            .setOngoing(true)
+            .build()
+    }
+
+    private fun updateCustomNotification(status: String, message: String, face: String = "neutral") {
+        val notification = createCustomNotification(status, message, face)
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.notify(1, notification)
     }
 
     private fun showHandshakeNotification(handshake: Handshake) {
         val contentText = getString(R.string.notification_handshake_captured, handshake.ap)
-        val remoteViews = createRemoteViews(contentText, "New handshake!", face)
         val notification = NotificationHelper.createNotification(this, "handshake_channel", "Handshake Notifications", contentText)
-        val manager = getSystemService(NotificationManager::class.java)
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.notify(2, notification)
-    }
-
-    private fun createRemoteViews(contentText: String, title: String, face: String): RemoteViews {
-        val remoteViews = RemoteViews(packageName, R.layout.notification_custom)
-        remoteViews.setTextViewText(R.id.notification_title, title)
-        remoteViews.setTextViewText(R.id.notification_message, contentText)
-        remoteViews.setTextViewText(R.id.notification_face, face)
-        return remoteViews
     }
 }
